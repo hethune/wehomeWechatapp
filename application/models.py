@@ -1,5 +1,5 @@
 from index import db
-from sqlalchemy.dialects import postgresql
+# from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import relationship
 import datetime
 
@@ -13,9 +13,9 @@ class IndexPage(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
   house_purchase_quantity = db.Column(db.Integer())
   rental_radio = db.Column(db.Float())
-  house_price_trend = db.Column(postgresql.ARRAY(db.String))
-  increase_radio = db.Column(postgresql.ARRAY(db.String))
-  rental_income_radio = db.Column(postgresql.ARRAY(db.String))
+  house_price_trend = db.Column(db.Text())
+  increase_radio = db.Column(db.Text())
+  rental_income_radio = db.Column(db.Text())
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
@@ -33,9 +33,9 @@ class CityPage(db.Model):
   two_room = db.Column(db.Float())
   three_room = db.Column(db.Float())
   rental_radio = db.Column(db.Float())
-  house_price_trend = db.Column(postgresql.ARRAY(db.String))
-  increase_radio = db.Column(postgresql.ARRAY(db.String))
-  rental_income_radio = db.Column(postgresql.ARRAY(db.String))
+  house_price_trend = db.Column(db.Text())
+  increase_radio = db.Column(db.Text())
+  rental_income_radio = db.Column(db.Text())
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
@@ -54,6 +54,6 @@ class HomePage(db.Model):
   increase_radio = db.Column(db.Float())
   rental_income_radio = db.Column(db.Float())
   furture_increase_radio = db.Column(db.Float())
-  house_price_trend = db.Column(postgresql.ARRAY(db.String))
+  house_price_trend = db.Column(db.Text())
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
