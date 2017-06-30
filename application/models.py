@@ -11,8 +11,7 @@ class City(db.Model):
 
 class IndexPage(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
-  house_purchase_quantity = db.Column(db.Integer())
-  rental_radio = db.Column(db.Float())
+  rental_radio = db.Column(db.Text())
   house_price_trend = db.Column(db.Text())
   increase_radio = db.Column(db.Text())
   rental_income_radio = db.Column(db.Text())
