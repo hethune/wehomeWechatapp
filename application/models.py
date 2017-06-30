@@ -21,12 +21,13 @@ class IndexPage(db.Model):
 
 class CityPage(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
-  city_id = db.Column(db.Integer(), db.ForeignKey("city.id"), index=True, nullable=False)
+  city_id = db.Column(db.Integer(), db.ForeignKey("city.id", ondelete="CASCADE"), index=True, nullable=False)
   house_sale_number = db.Column(db.Integer())
   house_rent_number = db.Column(db.Integer())
-  house_price_max = db.Column(db.Float())
-  house_price_median = db.Column(db.Float())
-  house_price_min = db.Column(db.Float())
+  block_villa_max = db.Column(db.Float())
+  block_villa_min = db.Column(db.Float())
+  block_apartment_max = db.Column(db.Float())
+  block_apartment_min = db.Column(db.Float())
   house_rent_max = db.Column(db.Float())
   house_rent_min = db.Column(db.Float())
   one_room = db.Column(db.Float())
@@ -41,11 +42,11 @@ class CityPage(db.Model):
 
 class HomePage(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
-  city_id = db.Column(db.Integer(), db.ForeignKey("city.id"), index=True, nullable=False)
+  city_id = db.Column(db.Integer(), db.ForeignKey("city.id", ondelete="CASCADE"), index=True, nullable=False)
   source_id = db.Column(db.String(255), index=True)
   score = db.Column(db.Float())
   house_price_dollar = db.Column(db.Float())
-  house_price_rmb = db.Column(db.Float())
+  exchange_rate = db.Column(db.Float())
   rent = db.Column(db.Float())
   size = db.Column(db.Integer())
   bedroom = db.Column(db.Integer())

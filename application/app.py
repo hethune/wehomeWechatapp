@@ -77,3 +77,7 @@ def home_page():
     return jsonify(success=False,
       message='Failed to get home page list')
   return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
+
+@app.route('/ping', methods=['GET'])
+def ping():
+  return 'pong'
