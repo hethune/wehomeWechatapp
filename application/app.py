@@ -12,7 +12,7 @@ logger = app.logger
 @json_validate(filter=['token'])
 @requires_auth
 def index_page():
-  columns = ['house_purchase_quantity', 'rental_radio', 
+  columns = ['rental_radio', 
     'house_price_trend', 'increase_radio', 'rental_income_radio']
   d = {}
   try:
