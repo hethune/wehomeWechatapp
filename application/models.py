@@ -58,6 +58,7 @@ class HomePage(db.Model):
   house_price_trend = db.Column(db.Text())
   longitude = db.Column(db.Float())
   latitude = db.Column(db.Float())
+  # md5 hash code for map_box_place_name
   hash_code = db.Column(db.Text(), index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
