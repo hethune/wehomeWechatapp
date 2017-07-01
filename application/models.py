@@ -43,6 +43,7 @@ class HomePage(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
   city_id = db.Column(db.Integer(), db.ForeignKey("city.id", ondelete="CASCADE"), index=True, nullable=False)
   source_id = db.Column(db.String(255), index=True)
+  map_box_place_name = db.Column(db.Text(), index=True)
   score = db.Column(db.Float())
   house_price_dollar = db.Column(db.Float())
   exchange_rate = db.Column(db.Float())
@@ -55,5 +56,13 @@ class HomePage(db.Model):
   rental_income_radio = db.Column(db.Float())
   furture_increase_radio = db.Column(db.Float())
   house_price_trend = db.Column(db.Text())
+  longitude = db.Column(db.Float())
+  latitude = db.Column(db.Float())
+  hash_code = db.Column(db.Text(), index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
+
+  __table_args__ = (
+    db.Index("idx_longitude_latitude", "longitude", "latitude"),
+    db.Index("idx_hash_code_place_name", "hash_code", "map_box_place_name"),
+  )
