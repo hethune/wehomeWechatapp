@@ -4,6 +4,7 @@ from index import app, db
 from .utils.helper import uuid_gen, json_validate, requires_auth
 from .utils.query import QueryHelper
 from flask import request, jsonify
+import json
 
 logger = app.logger
 
@@ -12,11 +13,14 @@ logger = app.logger
 @json_validate(filter=['token'])
 @requires_auth
 def index_page():
-  columns = ['rental_radio', 
-    'house_price_trend', 'increase_radio', 'rental_income_radio']
+  columns = ['rental_radio', 'house_price_trend', 'increase_radio', 'rental_income_radio']
   d = {}
   try:
     index_page = QueryHelper.get_index_page()
+    index_page.rental_radio = json.loads(index_page.rental_radio)
+    index_page.house_price_trend = json.loads(index_page.house_price_trend)
+    index_page.increase_radio = json.loads(index_page.increase_radio)
+    index_page.rental_income_radio = json.loads(index_page.rental_income_radio)
     d['index_page'] = index_page
   except Exception as e:
     logger.error("Failed to get index page list {}".format(e))
@@ -45,13 +49,17 @@ def get_cities():
 @json_validate(filter=['city_id', 'token'])
 @requires_auth
 def city_page():
-  columns = ['city_id', 'house_sale_number', 'house_rent_number', 'house_price_max', 
-    'house_price_median', 'house_price_min', 'house_rent_max', 'house_rent_min', 'one_room',
-    'two_room', 'three_room', 'rental_radio', 'house_price_trend', 'increase_radio', 'rental_income_radio']
+  columns = ['sale_online_offline', 'rent_online_offline', 'house_sale_number', 'house_rent_number',
+    'block_villa_max', 'block_villa_min', 'block_apartment_max', 'block_apartment_min', 'one_room_one_toilet',
+    'two_room_two_tiolet', 'three_room_two_tiolet', 'rental_radio', 'house_price_trend', 'increase_radio',
+    'rental_income_radio', 'list_average_price', 'deal_average_price']
   d = {}
   try:
     incoming = request.get_json()
     city_page = QueryHelper.get_city_page_with_city_id(city_id=incoming['city_id'])
+    city_page.rent_online_offline = json.loads(city_page.rent_online_offline)
+    city_page.sale_online_offline = json.loads(city_page.sale_online_offline)
+    city_page.house_price_trend = json.loads(city_page.house_price_trend)
     d['city_page'] = city_page
   except Exception as e:
     logger.error("Failed to get city page list {}".format(e))
@@ -64,13 +72,16 @@ def city_page():
 @json_validate(filter=['home_id', 'token'])
 @requires_auth
 def home_page():
-  columns = ['score', 'house_price_dollar', 'house_price_rmb',
-    'rent', 'size', 'bedroom', 'bathroom', 'rental_radio', 'increase_radio',
-    'rental_income_radio']
+  columns = ['map_box_place_name', 'score', 'house_price_dollar', 'house_price_dollar', 'exchange_rate',
+    'rent', 'size', 'bedroom', 'bathroom', 'rental_radio', 'increase_radio', 'rental_income_radio', 'furture_increase_radio',
+    'house_price_trend']
   d = {}
   try:
     incoming = request.get_json()
     home_page = QueryHelper.get_home_page_with_home_id(home_id=incoming['home_id'])
+    d['neighborhood_trend'] = json.loads(home_page.neighborhood.house_price_trend)
+    d['city_trend'] = json.loads(home_page.neighborhood.city.citypage.house_price_trend)
+    home_page.house_price_trend = json.loads(home_page.house_price_trend)
     d['home_page'] = home_page
   except Exception as e:
     logger.error("Failed to get home page list {}".format(e))
