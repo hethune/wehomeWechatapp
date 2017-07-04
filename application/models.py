@@ -35,7 +35,6 @@ class IndexPage(db.Model):
 class CityPage(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
   city_id = db.Column(db.Integer(), db.ForeignKey("city.id", ondelete="CASCADE"), index=True, nullable=False, unique=True)
-  neighbor_id = db.Column(db.Integer(), db.ForeignKey("neighborhood.id", ondelete="CASCADE"), index=True, nullable=False)
   sale_online_offline = db.Column(db.Text())
   rent_online_offline = db.Column(db.Text())
   house_sale_number = db.Column(db.Integer())
@@ -55,7 +54,6 @@ class CityPage(db.Model):
   rental_income_radio = db.Column(db.Float())
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
-  # city = relationship("City", back_populates="citypage", uselist=False)
   city = relationship("City", back_populates="citypage")
 
 class HomePage(db.Model):
