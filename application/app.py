@@ -74,7 +74,7 @@ def city_page():
 
 @app.route('/api/home_page', methods=['POST'])
 @uuid_gen
-@json_validate(filter=['home_id', 'token'])
+@json_validate(filter=['place_name', 'token'])
 @requires_auth
 def home_page():
   columns = ['map_box_place_name', 'score', 'house_price_dollar', 'house_price_dollar', 'exchange_rate',
@@ -83,7 +83,7 @@ def home_page():
   d = {}
   try:
     incoming = request.get_json()
-    home_page = QueryHelper.get_home_page_with_home_id(home_id=incoming['home_id'])
+    home_page = QueryHelper.get_home_page_with_place_name(place_name=incoming['place_name'])
     d['neighborhood_trend'] = json.loads(home_page.neighborhood.house_price_trend) if home_page.neighborhood.house_price_trend else None
     d['city_trend'] = json.loads(home_page.neighborhood.city.citypage.house_price_trend) if home_page.neighborhood.city.citypage.house_price_trend else None
     home_page.house_price_trend = json.loads(home_page.house_price_trend) if home_page.house_price_trend else None

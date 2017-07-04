@@ -1,5 +1,7 @@
 from ..models import City, IndexPage, CityPage, HomePage
 from flask import jsonify
+from sqlalchemy import and_
+import hashlib
 
 class QueryHelper(object):
   'You can use this class query the complex query via the SqlAlchemy query'
@@ -44,3 +46,9 @@ class QueryHelper(object):
   @classmethod
   def get_home_page_with_home_id(cls, home_id):
     return HomePage.query.filter_by(id=home_id).first()
+
+  @classmethod
+  def get_home_page_with_place_name(cls, place_name):
+    md5 = hashlib.md5()
+    md5.update(place_name)
+    return HomePage.query.filter(and_(HomePage.hash_code==md5.hexdigest(), HomePage.map_box_place_name==place_name)).first()

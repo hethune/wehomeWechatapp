@@ -61,7 +61,7 @@ class HomePage(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
   neighbor_id = db.Column(db.Integer(), db.ForeignKey("neighborhood.id", ondelete="CASCADE"), index=True, nullable=False)
   source_id = db.Column(db.String(255), index=True)
-  map_box_place_name = db.Column(db.Text(), index=True)
+  map_box_place_name = db.Column(db.Text())
   address = db.Column(db.Text(), index=True)
   score = db.Column(db.Float())
   house_price_dollar = db.Column(db.Float())
@@ -78,7 +78,7 @@ class HomePage(db.Model):
   longitude = db.Column(db.Float())
   latitude = db.Column(db.Float())
   # md5 hash code for map_box_place_name
-  hash_code = db.Column(db.String(32), index=True)
+  hash_code = db.Column(db.CHAR(32), index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
   neighborhood = relationship("Neighborhood", back_populates="homepages")
