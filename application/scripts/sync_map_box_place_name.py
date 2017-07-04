@@ -5,7 +5,12 @@ from sqlalchemy import text
 from index import db, app
 from JobSchedule import JobSchedule
 from multiprocessing import Queue
+from Queue import Empty
+from tqdm import tqdm
 
+pbar = None
+def update_bar(step=1):
+  pbar.update(step)
 
 def write_place_name_to_db(home_id, replace_name):
   with app.app_context():
@@ -24,34 +29,41 @@ def write_place_name_to_db(home_id, replace_name):
 
 def sync_by_address(queue):
   while not queue.empty():
-    data = queue.get_nowait()
-    print queue.empty(), '*'*30
-    home_id, address = data[0], data[1]
-    releveance = 0.9
-    url = "https://api.tiles.mapbox.com/geocoding/v5/mapbox.places/{address}.json".format(address=quote_plus(address))
-    querystring = {"country":"us","limit":"1","access_token": app.config['MAP_BOX_ACCESSTOKEN']}
-    headers = {
-        'cache-control': "no-cache",
-        }
-    response = requests.request("GET", url, headers=headers, params=querystring)
-    result = json.loads(response.text)
+    try:
+      data = queue.get(False)
+      home_id, address = data[0], data[1]
+      releveance = 0.9
+      url = "https://api.tiles.mapbox.com/geocoding/v5/mapbox.places/{address}.json".format(address=quote_plus(address))
+      querystring = {"country":"us","limit":"1","access_token": app.config['MAP_BOX_ACCESSTOKEN']}
+      headers = {
+          'cache-control': "no-cache",
+          }
+      response = requests.request("GET", url, headers=headers, params=querystring)
+      result = json.loads(response.text)
 
-    if len(result['features'])>0 and result['features'][0]['relevance']>= releveance:
-      write_place_name_to_db(home_id=home_id, replace_name=result['features'][0]['place_name']) 
+      if len(result['features'])>0 and result['features'][0]['relevance']>= releveance:
+        write_place_name_to_db(home_id=home_id, replace_name=result['features'][0]['place_name']) 
+      update_bar()
+    except Empty:
+      return
 
 def sync_by_lang_lat(queue):
   while not queue.empty():
-    data = queue.get_nowait()
-    home_id, lang, lat = data[0], data[1], data[2]
-    url = "https://api.mapbox.com/geocoding/v5/mapbox.places/{lang},{lat}.json".format(lang=lang, lat=lat)
-    querystring = {"country":"us","limit":"1","access_token": app.config['MAP_BOX_ACCESSTOKEN']}
-    headers = {
-        'cache-control': "no-cache",
-        }
-    response = requests.request("GET", url, headers=headers, params=querystring)
-    result = json.loads(response.text)
-    if len(result['features'])>0:
-      write_place_name_to_db(home_id=home_id, replace_name=result['features'][0]['place_name']) 
+    try:
+      data = queue.get(False)
+      home_id, lang, lat = data[0], data[1], data[2]
+      url = "https://api.mapbox.com/geocoding/v5/mapbox.places/{lang},{lat}.json".format(lang=lang, lat=lat)
+      querystring = {"country":"us","limit":"1","access_token": app.config['MAP_BOX_ACCESSTOKEN']}
+      headers = {
+          'cache-control': "no-cache",
+          }
+      response = requests.request("GET", url, headers=headers, params=querystring)
+      result = json.loads(response.text)
+      if len(result['features'])>0:
+        write_place_name_to_db(home_id=home_id, replace_name=result['features'][0]['place_name']) 
+      update_bar()
+    except Empty:
+      return
 
 def sync_place_data():
   place_q = Queue()
@@ -67,6 +79,7 @@ def sync_place_data():
   datas = db.session.execute(text(query))
   for item in datas:
     place_q.put(item)
+  pbar = tqdm(total=datas.rowcount)
   print'step one back-fill with place name start {count} rows'.format(count=datas.rowcount)
   jc = JobSchedule(function=sync_by_address, queue=place_q,
     prcesscount=None, thread_count=4)
@@ -74,15 +87,15 @@ def sync_place_data():
 
   lang_lat_q = Queue()
   query = '''
-  SELECT id, longitude, latitude
-  FROM  
-      home_page
-  WHERE
-     address is not null
-  AND
-     longitude is not null
-  AND
-     latitude is not null
+    SELECT id, longitude, latitude
+    FROM  
+        home_page
+    WHERE
+       map_box_place_name is null
+    AND
+       longitude is not null
+    AND
+       latitude is not null
   '''
   
   datas = db.session.execute(text(query))
