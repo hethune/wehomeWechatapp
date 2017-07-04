@@ -46,8 +46,8 @@ class CityPage(db.Model):
   block_apartment_max = db.Column(db.Float())
   block_apartment_min = db.Column(db.Float())
   one_room_one_toilet = db.Column(db.Text())
-  two_room_two_tiolet = db.Column(db.Text())
-  three_room_two_tiolet = db.Column(db.Text())
+  two_room_two_toilet = db.Column(db.Text())
+  three_room_two_toilet = db.Column(db.Text())
   rental_radio = db.Column(db.Float())
   house_price_trend = db.Column(db.Text())
   increase_radio = db.Column(db.Float())
@@ -62,6 +62,7 @@ class HomePage(db.Model):
   neighbor_id = db.Column(db.Integer(), db.ForeignKey("neighborhood.id", ondelete="CASCADE"), index=True, nullable=False)
   source_id = db.Column(db.String(255), index=True)
   map_box_place_name = db.Column(db.Text(), index=True)
+  address = db.Column(db.Text(), index=True)
   score = db.Column(db.Float())
   house_price_dollar = db.Column(db.Float())
   exchange_rate = db.Column(db.Float())
@@ -77,12 +78,11 @@ class HomePage(db.Model):
   longitude = db.Column(db.Float())
   latitude = db.Column(db.Float())
   # md5 hash code for map_box_place_name
-  hash_code = db.Column(db.Text(), index=True)
+  hash_code = db.Column(db.String(32), index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
   neighborhood = relationship("Neighborhood", back_populates="homepages")
 
   __table_args__ = (
     db.Index("idx_longitude_latitude", "longitude", "latitude"),
-    db.Index("idx_hash_code_place_name", "hash_code", "map_box_place_name"),
   )

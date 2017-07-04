@@ -17,10 +17,10 @@ def index_page():
   d = {}
   try:
     index_page = QueryHelper.get_index_page()
-    index_page.rental_radio = json.loads(index_page.rental_radio)
-    index_page.house_price_trend = json.loads(index_page.house_price_trend)
-    index_page.increase_radio = json.loads(index_page.increase_radio)
-    index_page.rental_income_radio = json.loads(index_page.rental_income_radio)
+    index_page.rental_radio = json.loads(index_page.rental_radio) if index_page.rental_radio else None
+    index_page.house_price_trend = json.loads(index_page.house_price_trend) if index_page.house_price_trend else None
+    index_page.increase_radio = json.loads(index_page.increase_radio) if index_page.increase_radio else None
+    index_page.rental_income_radio = json.loads(index_page.rental_income_radio) if index_page.rental_income_radio else None
     d['index_page'] = index_page
   except Exception as e:
     logger.error("Failed to get index page list {}".format(e))
@@ -51,17 +51,22 @@ def get_cities():
 def city_page():
   columns = ['sale_online_offline', 'rent_online_offline', 'house_sale_number', 'house_rent_number',
     'block_villa_max', 'block_villa_min', 'block_apartment_max', 'block_apartment_min', 'one_room_one_toilet',
-    'two_room_two_tiolet', 'three_room_two_tiolet', 'rental_radio', 'house_price_trend', 'increase_radio',
-    'rental_income_radio', 'list_average_price', 'deal_average_price']
+    'two_room_two_toilet', 'three_room_two_toilet', 'rental_radio', 'house_price_trend', 'increase_radio',
+    'rental_income_radio', 'list_average_price', 'deal_average_price', 'city_name']
   d = {}
   try:
     incoming = request.get_json()
     city_page = QueryHelper.get_city_page_with_city_id(city_id=incoming['city_id'])
-    city_page.rent_online_offline = json.loads(city_page.rent_online_offline)
-    city_page.sale_online_offline = json.loads(city_page.sale_online_offline)
-    city_page.house_price_trend = json.loads(city_page.house_price_trend)
+    d['city_name'] = city_page.city.city_name
+    city_page.rent_online_offline = json.loads(city_page.rent_online_offline) if city_page.rent_online_offline else None
+    city_page.sale_online_offline = json.loads(city_page.sale_online_offline) if city_page.sale_online_offline else None
+    city_page.house_price_trend = json.loads(city_page.house_price_trend) if city_page.house_price_trend else None
+    city_page.one_room_one_toilet = json.loads(city_page.one_room_one_toilet) if city_page.one_room_one_toilet else None
+    city_page.two_room_two_toilet = json.loads(city_page.two_room_two_toilet) if city_page.two_room_two_toilet else None
+    city_page.three_room_two_toilet = json.loads(city_page.three_room_two_toilet) if city_page.three_room_two_toilet else None
     d['city_page'] = city_page
   except Exception as e:
+    print e
     logger.error("Failed to get city page list {}".format(e))
     return jsonify(success=False,
       message='Failed to get city page list')
@@ -79,9 +84,9 @@ def home_page():
   try:
     incoming = request.get_json()
     home_page = QueryHelper.get_home_page_with_home_id(home_id=incoming['home_id'])
-    d['neighborhood_trend'] = json.loads(home_page.neighborhood.house_price_trend)
-    d['city_trend'] = json.loads(home_page.neighborhood.city.citypage.house_price_trend)
-    home_page.house_price_trend = json.loads(home_page.house_price_trend)
+    d['neighborhood_trend'] = json.loads(home_page.neighborhood.house_price_trend) if home_page.neighborhood.house_price_trend else None
+    d['city_trend'] = json.loads(home_page.neighborhood.city.citypage.house_price_trend) if home_page.neighborhood.city.citypage.house_price_trend else None
+    home_page.house_price_trend = json.loads(home_page.house_price_trend) if home_page.house_price_trend else None
     d['home_page'] = home_page
   except Exception as e:
     logger.error("Failed to get home page list {}".format(e))
