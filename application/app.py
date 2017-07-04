@@ -79,13 +79,15 @@ def city_page():
 def home_page():
   columns = ['map_box_place_name', 'score', 'house_price_dollar', 'house_price_dollar', 'exchange_rate',
     'rent', 'size', 'bedroom', 'bathroom', 'rental_radio', 'increase_radio', 'rental_income_radio', 'furture_increase_radio',
-    'house_price_trend']
+    'house_price_trend', 'neighborhood_rent_radio', 'city_name']
   d = {}
   try:
     incoming = request.get_json()
     home_page = QueryHelper.get_home_page_with_place_name(place_name=incoming['place_name'])
     d['neighborhood_trend'] = json.loads(home_page.neighborhood.house_price_trend) if home_page.neighborhood.house_price_trend else None
+    d['neighborhood_rent_radio']= home_page.neighborhood.neighbor_rental_radio
     d['city_trend'] = json.loads(home_page.neighborhood.city.citypage.house_price_trend) if home_page.neighborhood.city.citypage.house_price_trend else None
+    d['city_name'] = home_page.neighborhood.city.city_name
     home_page.house_price_trend = json.loads(home_page.house_price_trend) if home_page.house_price_trend else None
     d['home_page'] = home_page
   except Exception as e:
