@@ -7,10 +7,13 @@ from JobSchedule import JobSchedule
 from multiprocessing import Queue
 from Queue import Empty
 from tqdm import tqdm
+import time
 
-pbar = None
-def update_bar(step=1):
-  pbar.update(step)
+# def update_bar(pbar):
+#   print
+#   L.acquire()
+#   pbar.update()
+#   L.release()
 
 def write_place_name_to_db(home_id, replace_name):
   with app.app_context():
@@ -27,7 +30,7 @@ def write_place_name_to_db(home_id, replace_name):
     except Exception as e:
       db.session.rollback()
 
-def sync_by_address(queue):
+def sync_by_address(update_pbar, queue):
   while not queue.empty():
     try:
       data = queue.get(False)
@@ -43,11 +46,11 @@ def sync_by_address(queue):
 
       if len(result['features'])>0 and result['features'][0]['relevance']>= releveance:
         write_place_name_to_db(home_id=home_id, replace_name=result['features'][0]['place_name']) 
-      update_bar()
+      update_pbar()
     except Empty:
       return
 
-def sync_by_lang_lat(queue):
+def sync_by_lang_lat(update_pbar, queue):
   while not queue.empty():
     try:
       data = queue.get(False)
@@ -61,7 +64,7 @@ def sync_by_lang_lat(queue):
       result = json.loads(response.text)
       if len(result['features'])>0:
         write_place_name_to_db(home_id=home_id, replace_name=result['features'][0]['place_name']) 
-      update_bar()
+      update_pbar()
     except Empty:
       return
 
@@ -79,10 +82,11 @@ def sync_place_data():
   datas = db.session.execute(text(query))
   for item in datas:
     place_q.put(item)
-  pbar = tqdm(total=datas.rowcount)
+
   print'step one back-fill with place name start {count} rows'.format(count=datas.rowcount)
+  pbar = tqdm(total=datas.rowcount)
   jc = JobSchedule(function=sync_by_address, queue=place_q,
-    prcesscount=None, thread_count=4)
+    prcesscount=1, thread_count=8, pbar=pbar)
   jc.start()
 
   lang_lat_q = Queue()
@@ -103,6 +107,8 @@ def sync_place_data():
     lang_lat_q.put(item)
 
   print 'step two back-fill with lang and lat start {count} rows'.format(count=datas.rowcount)
+  pbar = tqdm(total=datas.rowcount)
   jc = JobSchedule(function=sync_by_lang_lat, queue=lang_lat_q,
-    prcesscount=None, thread_count=4)
+    prcesscount=1, thread_count=4, pbar=pbar)
   jc.start()
+  pbar.moveto(2)
