@@ -29,7 +29,7 @@ def write_place_name_to_db(home_id, replace_name):
     except Exception as e:
       db.session.rollback()
 
-def sync_by_address(update_pbar, queue):
+def sync_by_address(update_pbar, pid, queue):
   while not queue.empty():
     try:
       data = queue.get(False)
@@ -58,7 +58,7 @@ def sync_by_lang_lat(update_pbar, queue):
       data = queue.get(False)
       home_id, lang, lat = data[0], data[1], data[2]
       url = "https://api.mapbox.com/geocoding/v5/mapbox.places/{lang},{lat}.json".format(lang=lang, lat=lat)
-      querystring = {"country":"us","limit":"1","access_token": app.config['MAP_BOX_ACCESSTOKEN']}
+      querystring = {"country":"us","limit":"1","access_token": app.config['MAP_BOX_ACCESSTOKEN_LIST'][pid]}
       headers = {
           'cache-control': "no-cache",
           }
@@ -88,7 +88,7 @@ def sync_place_data():
 
   print'step one back-fill with place name start {count} rows'.format(count=datas.rowcount)
   jc = JobSchedule(function=sync_by_address, queue=place_q,
-    prcesscount=4, thread_count=100, max_size=datas.rowcount)
+    prcesscount=10, thread_count=100, max_size=datas.rowcount)
   jc.start()
 
   # lang_lat_q = Queue()

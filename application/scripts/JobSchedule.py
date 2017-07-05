@@ -8,10 +8,6 @@ from multiprocessing import Pool
 import time
 from tqdm import tqdm
 
-TL = TL()
-PL = PL()
-con = threading.Condition()
-
 class JobSchedule(object):
   def __init__(self, function,queue,prcesscount=None,thread_count=1, max_size=0):
     self.function = function
@@ -19,15 +15,12 @@ class JobSchedule(object):
     self.message_queue = Queue()
     self.thread_count = thread_count
     self.max_size = max_size
-    # self.share = Manager().dict()
-    # self.share['pbar'] = pbar
-    # self.pbar = pbar
     self.prcesscount = [prcesscount,cpu_count()][prcesscount is None]
 
-  def _makethread(self,target,thread_count,args):
+  def _makethread(self,target,thread_count,args, pid):
     thread_pool  = []
     for x in xrange(thread_count):
-      t = threading.Thread(target=target,args=(self.update_pbar, args))
+      t = threading.Thread(target=target,args=(self.update_pbar, pid, args))
       thread_pool.append(t)
     for process in thread_pool:
       process.start()
@@ -41,7 +34,7 @@ class JobSchedule(object):
 
     process_pool  = []
     for x in xrange(self.prcesscount):
-      p = Process(target=self._makethread,args=(self.function,self.thread_count,self.queue))
+      p = Process(target=self._makethread,args=(self.function,self.thread_count,self.queue, x))
       process_pool.append(p)
     for process in process_pool:
       process.start()
@@ -58,20 +51,6 @@ class JobSchedule(object):
         pbar.update()
       if message == 'finish':
         return
-
-    # PL.acquire()
-    # TL.acquire()
-    # self.share['pbar'] += 1
-    # print self.share['pbar']
-    # self.share['pbar'].update()
-    # TL.release()
-    # import time
-    # time.sleep(1)
-    # PL.release()
-    # while True:
-    # try:
-    # except Empty:
-    #   return
 
   def update_pbar(self, message):
     self.message_queue.put(message)
