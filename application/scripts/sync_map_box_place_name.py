@@ -6,7 +6,6 @@ from index import db, app
 from JobSchedule import JobSchedule
 from multiprocessing import Queue
 from Queue import Empty
-from tqdm import tqdm
 import time
 
 # def update_bar(pbar):
@@ -46,7 +45,7 @@ def sync_by_address(update_pbar, queue):
 
       if len(result['features'])>0 and result['features'][0]['relevance']>= releveance:
         write_place_name_to_db(home_id=home_id, replace_name=result['features'][0]['place_name']) 
-      update_pbar()
+      update_pbar('progress')
     except Empty:
       return
 
@@ -64,7 +63,7 @@ def sync_by_lang_lat(update_pbar, queue):
       result = json.loads(response.text)
       if len(result['features'])>0:
         write_place_name_to_db(home_id=home_id, replace_name=result['features'][0]['place_name']) 
-      update_pbar()
+      update_pbar('progress')
     except Empty:
       return
 
@@ -84,9 +83,8 @@ def sync_place_data():
     place_q.put(item)
 
   print'step one back-fill with place name start {count} rows'.format(count=datas.rowcount)
-  pbar = tqdm(total=datas.rowcount)
   jc = JobSchedule(function=sync_by_address, queue=place_q,
-    prcesscount=1, thread_count=8, pbar=pbar)
+    prcesscount=4, thread_count=8, max_size=datas.rowcount)
   jc.start()
 
   lang_lat_q = Queue()
@@ -107,8 +105,6 @@ def sync_place_data():
     lang_lat_q.put(item)
 
   print 'step two back-fill with lang and lat start {count} rows'.format(count=datas.rowcount)
-  pbar = tqdm(total=datas.rowcount)
   jc = JobSchedule(function=sync_by_lang_lat, queue=lang_lat_q,
-    prcesscount=1, thread_count=4, pbar=pbar)
+    prcesscount=4, thread_count=8, max_size=datas.rowcount)
   jc.start()
-  pbar.moveto(2)
