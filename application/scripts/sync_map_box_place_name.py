@@ -48,8 +48,9 @@ def sync_by_address(update_pbar, queue):
       update_pbar('progress')
     except Empty:
       return
-    except Exception:
+    except Exception as e:
       update_pbar('progress')
+      time.sleep(10)
 
 def sync_by_lang_lat(update_pbar, queue):
   while not queue.empty():
@@ -79,6 +80,7 @@ def sync_place_data():
        address is not null
     AND
        map_box_place_name is null
+    LIMIT 10000
   '''
   datas = db.session.execute(text(query))
   for item in datas:
@@ -86,7 +88,7 @@ def sync_place_data():
 
   print'step one back-fill with place name start {count} rows'.format(count=datas.rowcount)
   jc = JobSchedule(function=sync_by_address, queue=place_q,
-    prcesscount=8, thread_count=50, max_size=datas.rowcount)
+    prcesscount=4, thread_count=100, max_size=datas.rowcount)
   jc.start()
 
   # lang_lat_q = Queue()
