@@ -48,6 +48,8 @@ def sync_by_address(update_pbar, queue):
       update_pbar('progress')
     except Empty:
       return
+    except Exception:
+      update_pbar('progress')
 
 def sync_by_lang_lat(update_pbar, queue):
   while not queue.empty():
@@ -84,27 +86,27 @@ def sync_place_data():
 
   print'step one back-fill with place name start {count} rows'.format(count=datas.rowcount)
   jc = JobSchedule(function=sync_by_address, queue=place_q,
-    prcesscount=4, thread_count=8, max_size=datas.rowcount)
+    prcesscount=8, thread_count=50, max_size=datas.rowcount)
   jc.start()
 
-  lang_lat_q = Queue()
-  query = '''
-    SELECT id, longitude, latitude
-    FROM  
-        home_page
-    WHERE
-       map_box_place_name is null
-    AND
-       longitude is not null
-    AND
-       latitude is not null
-  '''
-  
-  datas = db.session.execute(text(query))
-  for item in datas:
-    lang_lat_q.put(item)
+  # lang_lat_q = Queue()
+  # query = '''
+  #   SELECT id, longitude, latitude
+  #   FROM  
+  #       home_page
+  #   WHERE
+  #      map_box_place_name is null
+  #   AND
+  #      longitude is not null
+  #   AND
+  #      latitude is not null
+  # '''
+  # 
+  # datas = db.session.execute(text(query))
+  # for item in datas:
+  #   lang_lat_q.put(item)
 
-  print 'step two back-fill with lang and lat start {count} rows'.format(count=datas.rowcount)
-  jc = JobSchedule(function=sync_by_lang_lat, queue=lang_lat_q,
-    prcesscount=4, thread_count=8, max_size=datas.rowcount)
-  jc.start()
+  # print 'step two back-fill with lang and lat start {count} rows'.format(count=datas.rowcount)
+  # jc = JobSchedule(function=sync_by_lang_lat, queue=lang_lat_q,
+  #   prcesscount=4, thread_count=50, max_size=datas.rowcount)
+  # jc.start()
