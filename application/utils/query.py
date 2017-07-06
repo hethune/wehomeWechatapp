@@ -1,4 +1,5 @@
-from ..models import City, IndexPage, CityPage, HomePage
+from ..models import City, IndexPage, CityPage, HomePage, UnmatchedPlace
+from index import app, db
 from flask import jsonify
 from sqlalchemy import and_
 import hashlib
@@ -52,3 +53,21 @@ class QueryHelper(object):
     md5 = hashlib.md5()
     md5.update(place_name.encode("utf-8"))
     return HomePage.query.filter(and_(HomePage.hash_code==md5.hexdigest(), HomePage.map_box_place_name==place_name)).first()
+
+  @classmethod
+  def get_unmatched_place(cls, place_name):
+    return UnmatchedPlace.query.filter_by(place_name=place_name).first()
+
+  @classmethod
+  def add_unmatched_place(cls, place_name):
+    place = cls.get_unmatched_place(place_name)
+    if place:
+      return True
+    try:
+      place = UnmatchedPlace(place_name=place_name)
+      db.session.add(place)
+      db.session.commit()
+    except (DataError, IntegrityError), e:
+      app.logger.error(sys._getframe().f_code.co_name + str(e))
+      return False
+    return True
