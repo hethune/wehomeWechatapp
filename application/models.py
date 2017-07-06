@@ -75,8 +75,6 @@ class HomePage(db.Model):
   rental_radio = db.Column(db.Float())
   increase_radio = db.Column(db.Float())
   rental_income_radio = db.Column(db.Float())
-  furture_increase_radio = db.Column(db.Float())
-  house_price_trend = db.Column(db.Text())
   longitude = db.Column(db.Float())
   latitude = db.Column(db.Float())
   # md5 hash code for map_box_place_name
