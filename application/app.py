@@ -84,6 +84,12 @@ def home_page():
   try:
     incoming = request.get_json()
     home_page = QueryHelper.get_home_page_with_place_name(place_name=incoming['place_name'])
+    if not home_page:
+      QueryHelper.add_unmatched_place(place_name=incoming['place_name'])
+      logger.error("Failed to get home page list we cant't find the given place")
+      return jsonify(success=False,
+        message='Failed to get home page list'), 409
+
     d['neighborhood_trend'] = json.loads(home_page.neighborhood.house_price_trend) if home_page.neighborhood.house_price_trend else None
     d['neighborhood_rent_radio']= home_page.neighborhood.neighbor_rental_radio
     d['city_trend'] = json.loads(home_page.neighborhood.city.citypage.house_price_trend) if home_page.city and home_page.city.citypage.house_price_trend else None
@@ -94,7 +100,7 @@ def home_page():
   except Exception as e:
     logger.error("Failed to get home page list {}".format(e))
     return jsonify(success=False,
-      message='Failed to get home page list')
+      message='Failed to get home page list'), 409
   return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
 
 @app.route('/ping', methods=['GET'])

@@ -89,3 +89,12 @@ class HomePage(db.Model):
   __table_args__ = (
     db.Index("idx_longitude_latitude", "longitude", "latitude"),
   )
+
+class UnmatchedPlace(db.Model):
+  id = db.Column(db.Integer(), index=True, primary_key=True)
+  place_name = db.Column(db.Text(), index=True)
+  created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
+  updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
+
+  def __init__(self, place_name):
+    self.place_name = place_name
