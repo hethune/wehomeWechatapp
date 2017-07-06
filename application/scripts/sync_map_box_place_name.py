@@ -42,7 +42,7 @@ def sync_by_address(update_pbar, pid, queue):
           }
       response = requests.request("GET", url, headers=headers, params=querystring)
       result = json.loads(response.text)
-
+      
       if len(result['features'])>0 and result['features'][0]['relevance']>= releveance:
         write_place_name_to_db(home_id=home_id, replace_name=result['features'][0]['place_name']) 
       update_pbar('progress')
@@ -88,7 +88,7 @@ def sync_place_data():
 
   print'step one back-fill with place name start {count} rows'.format(count=datas.rowcount)
   jc = JobSchedule(function=sync_by_address, queue=place_q,
-    prcesscount=10, thread_count=100, max_size=datas.rowcount)
+    prcesscount=app.config['PROCESS_COUNT'], thread_count=app.config['THREAD_COUNT'], max_size=datas.rowcount)
   jc.start()
 
   # lang_lat_q = Queue()
