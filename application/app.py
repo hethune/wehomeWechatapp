@@ -78,8 +78,8 @@ def city_page():
 @requires_auth
 def home_page():
   columns = ['map_box_place_name', 'score', 'house_price_dollar', 'house_price_dollar', 'exchange_rate',
-    'rent', 'size', 'bedroom', 'bathroom', 'rental_radio', 'increase_radio', 'rental_income_radio', 'furture_increase_radio',
-    'house_price_trend', 'neighborhood_rent_radio', 'city_name']
+    'rent', 'size', 'bedroom', 'bathroom', 'rental_radio', 'increase_radio', 'rental_income_radio',
+    'neighborhood_rent_radio', 'city_name']
   d = {}
   try:
     incoming = request.get_json()
@@ -95,7 +95,6 @@ def home_page():
     d['city_trend'] = json.loads(home_page.neighborhood.city.citypage.house_price_trend) if home_page.city and home_page.city.citypage.house_price_trend else None
     d['city_name'] = home_page.city.city_name if home_page.city else None
     d['exchange_rate'] = QueryHelper.get_index_page().exchange_rate
-    home_page.house_price_trend = json.loads(home_page.house_price_trend) if home_page.house_price_trend else None
     d['home_page'] = home_page
   except Exception as e:
     logger.error("Failed to get home page list {}".format(e))
