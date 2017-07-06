@@ -7,6 +7,7 @@ from JobSchedule import JobSchedule
 from multiprocessing import Queue
 from Queue import Empty
 import time
+import random
 
 # def update_bar(pbar):
 #   print
@@ -49,24 +50,27 @@ def sync_by_address(update_pbar, pid, queue):
     try:
       data = queue.get(False)
       home_id, address = data[0], data[1]
+      # proxies = {
+      #   "https": "http://{ip}".format(ip=app.config['MAP_BOX_IP_POOL'][random.randint(0, 200)]['ip'])
+      # }
       releveance = 0.9
       url = "https://api.tiles.mapbox.com/geocoding/v5/mapbox.places/{address}.json".format(address=quote_plus(address))
       querystring = {"country":"us","limit":"1","access_token": app.config['MAP_BOX_ACCESSTOKEN']}
       headers = {
           'cache-control': "no-cache",
           }
-      response = requests.request("GET", url, headers=headers, params=querystring)
+      response = requests.request("GET", url, headers=headers, params=querystring, proxies=None)
       result = json.loads(response.text)
       
       if len(result['features'])>0 and result['features'][0]['relevance']>= releveance:
         write_place_name_to_db(home_id=home_id, replace_name=result['features'][0]['place_name']) 
-      update_pbar('progress')
+      update_step(home_id=home_id, step=1)
     except Empty:
       return
     except Exception as e:
-      update_pbar('progress')
+      update_step(home_id=home_id, step=2)
       time.sleep(10)
-    update_step(home_id=home_id, step=1)
+    update_pbar('progress')
 
 def sync_by_lang_lat(update_pbar, queue):
   while not queue.empty():
