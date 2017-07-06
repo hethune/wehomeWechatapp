@@ -10,6 +10,7 @@ class City(db.Model):
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
   neighborhoods = relationship("Neighborhood", back_populates="city")
+  homepages = relationship("HomePage", back_populates="city")
   citypage = relationship("CityPage", back_populates="city", uselist=False)
 
 class Neighborhood(db.Model):
@@ -83,6 +84,7 @@ class HomePage(db.Model):
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
   neighborhood = relationship("Neighborhood", back_populates="homepages")
+  city = relationship("City", back_populates="homepages")
 
   __table_args__ = (
     db.Index("idx_longitude_latitude", "longitude", "latitude"),
