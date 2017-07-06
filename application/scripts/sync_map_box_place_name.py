@@ -29,6 +29,21 @@ def write_place_name_to_db(home_id, replace_name):
     except Exception as e:
       db.session.rollback()
 
+def update_step(home_id, step):
+  with app.app_context():
+    query = '''
+      UPDATE home_page 
+      SET 
+          step = {step}
+      WHERE
+          id = {home_id}
+    '''.format(home_id=home_id, step=step)
+    try:
+      db.session.execute(text(query))
+      db.session.commit()
+    except Exception as e:
+      db.session.rollback()
+
 def sync_by_address(update_pbar, pid, queue):
   while not queue.empty():
     try:
@@ -51,6 +66,7 @@ def sync_by_address(update_pbar, pid, queue):
     except Exception as e:
       update_pbar('progress')
       time.sleep(10)
+    update_step(home_id=home_id, step=1)
 
 def sync_by_lang_lat(update_pbar, queue):
   while not queue.empty():
@@ -80,6 +96,8 @@ def sync_place_data():
        address is not null
     AND
        map_box_place_name is null
+    AND
+      step is null
     LIMIT 10000
   '''
   datas = db.session.execute(text(query))

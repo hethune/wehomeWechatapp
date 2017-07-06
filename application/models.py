@@ -81,6 +81,8 @@ class HomePage(db.Model):
   latitude = db.Column(db.Float())
   # md5 hash code for map_box_place_name
   hash_code = db.Column(db.CHAR(32), index=True)
+  # which step back fill in
+  step = db.Column(db.Integer(), default=0, index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
   neighborhood = relationship("Neighborhood", back_populates="homepages")
