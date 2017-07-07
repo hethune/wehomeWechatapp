@@ -3,6 +3,9 @@ from index import app, db
 from flask import jsonify
 from sqlalchemy import and_
 import hashlib
+from urllib import quote_plus
+import requests
+import json
 
 class QueryHelper(object):
   'You can use this class query the complex query via the SqlAlchemy query'
@@ -75,7 +78,7 @@ class QueryHelper(object):
   @classmethod
   def parse_address_by_map_box(cls, place_name):
     try:
-      releveance = 0.9
+      releveance = 0.7
       url = "https://api.tiles.mapbox.com/geocoding/v5/mapbox.places/{address}.json".format(address=quote_plus(place_name))
       querystring = {"country":"us","limit":"1","access_token": app.config['MAP_BOX_ACCESSTOKEN']}
       headers = {
@@ -83,9 +86,8 @@ class QueryHelper(object):
           }
       response = requests.request("GET", url, headers=headers, params=querystring, proxies=None)
       result = json.loads(response.text)
-      
       if len(result['features'])>0 and result['features'][0]['relevance']>= releveance:
         return result['features'][0]['place_name']
-    except Exception:
+    except Exception as e:
       return place_name
     return place_name
