@@ -66,7 +66,6 @@ def city_page():
     city_page.three_room_two_toilet = json.loads(city_page.three_room_two_toilet) if city_page.three_room_two_toilet else None
     d['city_page'] = city_page
   except Exception as e:
-    print e
     logger.error("Failed to get city page list {}".format(e))
     return jsonify(success=False,
       message='Failed to get city page list')
@@ -77,18 +76,23 @@ def city_page():
 @json_validate(filter=['place_name', 'token'])
 @requires_auth
 def home_page():
+  incoming = request.get_json()
   columns = ['map_box_place_name', 'score', 'house_price_dollar', 'house_price_dollar', 'exchange_rate',
     'rent', 'size', 'bedroom', 'bathroom', 'rental_radio', 'increase_radio', 'rental_income_radio',
-    'neighborhood_rent_radio', 'city_name']
+    'neighborhood_rent_radio', 'city_name', 'city_trend', 'neighborhood_trend']
   d = {}
+  place_name = incoming['place_name']
   try:
-    incoming = request.get_json()
-    home_page = QueryHelper.get_home_page_with_place_name(place_name=incoming['place_name'])
+    if app.config['IS_PARSE_ADDRESS']:
+      place_name = QueryHelper.parse_address_by_map_box(place_name=place_name)
+      print place_name, '*'*30
+
+    home_page = QueryHelper.get_home_page_with_place_name(place_name=place_name)
     if not home_page:
       QueryHelper.add_unmatched_place(place_name=incoming['place_name'])
       logger.error("Failed to get home page list we cant't find the given place")
       return jsonify(success=False,
-        message='Failed to get home page list'), 409
+        message="Failed to get home page list we cant't find the given place"), 409
 
     d['neighborhood_trend'] = json.loads(home_page.neighborhood.house_price_trend) if home_page.neighborhood.house_price_trend else None
     d['neighborhood_rent_radio']= home_page.neighborhood.neighbor_rental_radio

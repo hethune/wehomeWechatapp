@@ -71,3 +71,21 @@ class QueryHelper(object):
       app.logger.error(sys._getframe().f_code.co_name + str(e))
       return False
     return True
+
+  @classmethod
+  def parse_address_by_map_box(cls, place_name):
+    try:
+      releveance = 0.9
+      url = "https://api.tiles.mapbox.com/geocoding/v5/mapbox.places/{address}.json".format(address=quote_plus(place_name))
+      querystring = {"country":"us","limit":"1","access_token": app.config['MAP_BOX_ACCESSTOKEN']}
+      headers = {
+          'cache-control': "no-cache",
+          }
+      response = requests.request("GET", url, headers=headers, params=querystring, proxies=None)
+      result = json.loads(response.text)
+      
+      if len(result['features'])>0 and result['features'][0]['relevance']>= releveance:
+        return result['features'][0]['place_name']
+    except Exception:
+      return place_name
+    return place_name
