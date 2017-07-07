@@ -9,20 +9,20 @@ class City(db.Model):
   eng_name = db.Column(db.String(255), index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
-  neighborhoods = relationship("Neighborhood", back_populates="city")
+  # neighborhoods = relationship("Neighborhood", back_populates="city")
   homepages = relationship("HomePage", back_populates="city")
   citypage = relationship("CityPage", back_populates="city", uselist=False)
 
 class Neighborhood(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
-  city_id = db.Column(db.Integer(), db.ForeignKey("city.id", ondelete="CASCADE"), index=True, nullable=False)
+  # city_id = db.Column(db.Integer(), db.ForeignKey("city.id", ondelete="CASCADE"), index=True, nullable=False)
   neighbor_name = db.Column(db.Text())
   neighbor_rental_radio = db.Column(db.Float())
   house_price_trend = db.Column(db.Text())
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
   homepages = relationship("HomePage", back_populates="neighborhood")
-  city = relationship("City", back_populates="neighborhoods")
+  # city = relationship("City", back_populates="neighborhoods")
 
 class IndexPage(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
