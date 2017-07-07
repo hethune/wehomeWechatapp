@@ -85,7 +85,6 @@ def home_page():
   try:
     if app.config['IS_PARSE_ADDRESS']:
       place_name = QueryHelper.parse_address_by_map_box(place_name=place_name)
-      print place_name, '*'*30
 
     home_page = QueryHelper.get_home_page_with_place_name(place_name=place_name)
     if not home_page:
