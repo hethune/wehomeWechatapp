@@ -92,7 +92,7 @@ def home_page():
 
     d['neighborhood_trend'] = json.loads(home_page.neighborhood.house_price_trend) if home_page.neighborhood.house_price_trend else None
     d['neighborhood_rent_radio']= home_page.neighborhood.neighbor_rental_radio
-    d['city_trend'] = json.loads(home_page.neighborhood.city.citypage.house_price_trend) if home_page.city and home_page.city.citypage.house_price_trend else None
+    d['city_trend'] = json.loads(home_page.city.citypage.house_price_trend) if home_page.city and home_page.city.citypage.house_price_trend else None
     d['city_name'] = home_page.city.city_name if home_page.city else None
     d['exchange_rate'] = QueryHelper.get_index_page().exchange_rate
     d['home_page'] = home_page
