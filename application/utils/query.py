@@ -58,16 +58,16 @@ class QueryHelper(object):
     return HomePage.query.filter(and_(HomePage.hash_code==md5.hexdigest(), HomePage.map_box_place_name==place_name)).first()
 
   @classmethod
-  def get_unmatched_place(cls, place_name):
-    return UnmatchedPlace.query.filter_by(place_name=place_name).first()
+  def get_unmatched_place_with_name_type(cls, place_name, type):
+    return UnmatchedPlace.query.filter(and_(UnmatchedPlace.place_name==place_name, UnmatchedPlace.type==type)).first()
 
   @classmethod
-  def add_unmatched_place(cls, place_name):
-    place = cls.get_unmatched_place(place_name)
+  def add_unmatched_place(cls, place_name, type):
+    place = cls.get_unmatched_place_with_name_type(place_name, type)
     if place:
       return True
     try:
-      place = UnmatchedPlace(place_name=place_name)
+      place = UnmatchedPlace(place_name=place_name, type=type)
       db.session.add(place)
       db.session.commit()
     except (DataError, IntegrityError), e:

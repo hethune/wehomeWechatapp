@@ -99,8 +99,17 @@ class HomePage(db.Model):
 class UnmatchedPlace(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
   place_name = db.Column(db.Text(), index=True)
+  # one of ['map_box_place_name', 'score', 'house_price_dollar', 'exchange_rate',
+  #  'rent', 'rental_radio', 'increase_radio', 'rental_income_radio',
+  #  'neighborhood_rent_radio', 'city_name', 'city_trend', 'neighborhood_trend']
+  type = db.Column(db.String(64), index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
-  def __init__(self, place_name):
+  def __init__(self, place_name, type):
     self.place_name = place_name
+    self.type = type
+
+  __table_args__ = (
+    db.Index("idx_place_name_type", "place_name", "type"),
+  )
