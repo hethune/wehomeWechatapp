@@ -78,7 +78,7 @@ class HomePage(db.Model):
   size = db.Column(db.Integer())
   bedroom = db.Column(db.Integer())
   bathroom = db.Column(db.Float())
-  rental_radio = db.Column(db.Float())
+  rental_radio = db.Column(db.Float(), index=True)
   increase_radio = db.Column(db.Float())
   rental_income_radio = db.Column(db.Float())
   longitude = db.Column(db.Float())
