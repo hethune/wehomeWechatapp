@@ -52,7 +52,9 @@ def city_page():
   columns = ['sale_online_offline', 'rent_online_offline', 'house_sale_number', 'house_rent_number',
     'block_villa_max', 'block_villa_min', 'block_apartment_max', 'block_apartment_min', 'one_room_one_toilet',
     'two_room_two_toilet', 'three_room_two_toilet', 'rental_radio', 'house_price_trend', 'increase_radio',
-    'rental_income_radio', 'list_average_price', 'deal_average_price', 'city_name']
+    'rental_income_radio', 'list_average_price', 'deal_average_price', 'city_name', 'one_bed_one_bath_lower_bound',
+    'one_bed_one_bath_upper_bound', 'two_bed_two_bath_lower_bound', 'two_bed_two_bath_upper_bound', 'three_bed_two_bath_lower_bound',
+    'three_bed_two_bath_upper_bound']
   d = {}
   try:
     incoming = request.get_json()
