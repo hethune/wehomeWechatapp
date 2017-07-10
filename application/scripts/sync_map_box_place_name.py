@@ -53,13 +53,13 @@ def sync_by_address(update_pbar, pid, queue):
       # proxies = {
       #   "https": "http://{ip}".format(ip=app.config['MAP_BOX_IP_POOL'][random.randint(0, 200)]['ip'])
       # }
-      releveance = 0.9
+      releveance = 0.7
       url = "https://api.tiles.mapbox.com/geocoding/v5/mapbox.places/{address}.json".format(address=quote_plus(address))
       querystring = {"country":"us","limit":"1","access_token": app.config['MAP_BOX_ACCESSTOKEN']}
       headers = {
           'cache-control': "no-cache",
           }
-      response = requests.request("GET", url, headers=headers, params=querystring, proxies=None)
+      response = requests.request("GET", url, headers=headers, params=querystring, proxies=None, timeout=5)
       result = json.loads(response.text)
       
       if len(result['features'])>0 and result['features'][0]['relevance']>= releveance:
@@ -102,7 +102,7 @@ def sync_place_data():
        map_box_place_name is null
     AND
       step is null
-    LIMIT 10000
+    LIMIT 1000
   '''
   datas = db.session.execute(text(query))
   for item in datas:
