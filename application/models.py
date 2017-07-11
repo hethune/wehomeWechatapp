@@ -19,6 +19,7 @@ class Neighborhood(db.Model):
   neighbor_name = db.Column(db.Text())
   neighbor_rental_radio = db.Column(db.Float())
   house_price_trend = db.Column(db.Text())
+  neighborhood_score = db.Column(db.Float(), index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
   homepages = relationship("HomePage", back_populates="neighborhood")
@@ -87,6 +88,8 @@ class HomePage(db.Model):
   hash_code = db.Column(db.CHAR(32), index=True)
   # which step back fill in
   step = db.Column(db.Integer(), default=0, index=True)
+  adjust_score = db.Column(db.Float(), index=True)
+  property_score = db.Column(db.Float(), index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
   neighborhood = relationship("Neighborhood", back_populates="homepages")
