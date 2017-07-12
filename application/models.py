@@ -122,3 +122,6 @@ class FeedBack(db.Model):
   content = db.Column(db.Text(), index=True, nullable=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
+
+  def __init__(self, content):
+    self.content = content

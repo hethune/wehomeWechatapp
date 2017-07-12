@@ -125,6 +125,20 @@ def home_page():
       message='Failed to get home page list'), 409
   return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
 
+@app.route('/api/set_feedback', methods=['POST'])
+@uuid_gen
+@json_validate(filter=['content', 'token'])
+@requires_auth
+def set_feedback():
+  incoming = request.get_json()
+  is_success = QueryHelper.add_feed_back(content=incoming['content'])
+  if not is_success:
+    logger.error('Failed to set feed back')
+    return jsonify(success=False,
+      message='Failed to set feed back'), 409
+  return jsonify(success=True,
+      message='Success to set feed back')
+
 @app.route('/ping', methods=['GET'])
 def ping():
   return 'pong'
