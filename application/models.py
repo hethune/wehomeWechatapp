@@ -150,3 +150,25 @@ class User(db.Model):
     self.country = country
     self.avatar_url = avatar_url
     self.phone = phone
+
+class Phone(db.Model):
+  id = db.Column(db.Integer(), index=True, primary_key=True)
+  phone = db.Column(db.String(255))
+  country = db.Column(db.String(255))
+  verification_code = db.Column(db.String(255))
+  verification_code_created_at = db.Column(db.DateTime())
+  is_verified = db.Column(db.Boolean(), index=True)
+  created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
+  updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
+  __table_args__ = (
+    db.Index("idx_phone", "phone"),
+    db.Index("idx_phone_country", "phone", "country"),
+    db.UniqueConstraint("phone", "country", name='unique_phone_contry'),
+  )
+
+  def __init__(self, phone, country, verification_code, verification_code_created_at, is_verified=False):
+    self.phone = phone
+    self.country = country
+    self.verification_code = verification_code
+    self.verification_code_created_at = verification_code_created_at
+    self.is_verified = is_verified
