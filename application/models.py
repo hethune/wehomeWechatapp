@@ -116,3 +116,9 @@ class UnmatchedPlace(db.Model):
   __table_args__ = (
     db.Index("idx_place_name_type", "place_name", "type"),
   )
+
+class FeedBack(db.Model):
+  id = db.Column(db.Integer(), index=True, primary_key=True)
+  content = db.Column(db.Text(), index=True, nullable=True)
+  created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
+  updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
