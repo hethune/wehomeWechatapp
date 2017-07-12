@@ -1,7 +1,7 @@
 import uuid
 import flask
 from functools import wraps, partial
-from flask import request, jsonify
+from flask import request, jsonify, g, session
 from index import app
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous import SignatureExpired, BadSignature
@@ -31,7 +31,7 @@ def json_validate(f=None, filter=[]):
     return f(*args, **kwargs)
   return decorated
 
-def requires_auth(f=None):
+def requires_token(f=None):
   if not f:
     return partial(requires_auth, role=role)
   @wraps(f)
@@ -40,7 +40,21 @@ def requires_auth(f=None):
     token = incoming['token']
     if token == app.config['WECHAT_TOKEN']:
       return f(*args, **kwargs)
-    return jsonify(message="Authentication is required to access this resource"), 401
+    return jsonify(message="Token is required to access this resource"), 401
+  return decorated
+
+def requires_auth(f=None):
+  if not f:
+    return partial(requires_auth, role=role)
+  @wraps(f)
+  def decorated(*args, **kwargs):
+    incoming = request.get_json()
+    third_session = incoming['thirdsession']
+    user = verify_token(third_session)
+    if user and session[str(user['id'])]==third_session:
+      g.current_user = user
+      return f(*args, **kwargs)
+    return jsonify(message="Authorization is required to access this resource"), 401
   return decorated
 
 def generate_token(user, expiration=TWO_HOURS):

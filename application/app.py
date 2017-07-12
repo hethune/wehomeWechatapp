@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from .models import City
 from index import app, db
-from .utils.helper import uuid_gen, json_validate, requires_auth, generate_token, verify_token
+from .utils.helper import uuid_gen, json_validate, requires_token, generate_token, verify_token, requires_auth
 from .utils.query import QueryHelper
 from flask import request, jsonify, session
 import json
@@ -11,7 +11,7 @@ logger = app.logger
 @app.route('/api/index_page', methods=['POST'])
 @uuid_gen
 @json_validate(filter=['token'])
-@requires_auth
+@requires_token
 def index_page():
   columns = ['rental_radio', 'house_price_trend', 'increase_radio', 'rental_income_radio']
   d = {}
@@ -31,7 +31,7 @@ def index_page():
 @app.route('/api/get_cities', methods=['POST'])
 @uuid_gen
 @json_validate(filter=['token'])
-@requires_auth
+@requires_token
 def get_cities():
   columns = ['id', 'city_name']
   d = {}
@@ -47,7 +47,7 @@ def get_cities():
 @app.route('/api/city_page', methods=['POST'])
 @uuid_gen
 @json_validate(filter=['city_id', 'token'])
-@requires_auth
+@requires_token
 def city_page():
   columns = ['sale_online_offline', 'rent_online_offline', 'house_sale_number', 'house_rent_number',
     'block_villa_max', 'block_villa_min', 'block_apartment_max', 'block_apartment_min', 'one_room_one_toilet',
@@ -76,6 +76,7 @@ def city_page():
 @app.route('/api/home_page', methods=['POST'])
 @uuid_gen
 @json_validate(filter=['place_name', 'token'])
+@requires_token
 @requires_auth
 def home_page():
   incoming = request.get_json()
@@ -128,6 +129,7 @@ def home_page():
 @app.route('/api/set_feedback', methods=['POST'])
 @uuid_gen
 @json_validate(filter=['content', 'token'])
+@requires_token
 @requires_auth
 def set_feedback():
   incoming = request.get_json()
@@ -142,6 +144,7 @@ def set_feedback():
 @app.route('/api/login', methods=['POST'])
 @uuid_gen
 @json_validate(filter=['token', 'code', 'rawdata'])
+@requires_token
 def login():
   incoming = request.get_json()
   # get wechat sssion key and openid
