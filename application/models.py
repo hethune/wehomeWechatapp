@@ -125,3 +125,28 @@ class FeedBack(db.Model):
 
   def __init__(self, content):
     self.content = content
+
+class User(db.Model):
+  id = db.Column(db.Integer(), index=True, primary_key=True)
+  phone = db.Column(db.String(255), index=True)
+  openid = db.Column(db.String(64), index=True)
+  nick_name= db.Column(db.String(255))
+  gender = db.Column(db.Integer)
+  language = db.Column(db.String(255), index=True)
+  city = db.Column(db.String(255), index=True)
+  province = db.Column(db.String(255), index=True)
+  country = db.Column(db.String(255), index=True)
+  avatar_url = db.Column(db.String(1024))
+  created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
+  updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
+
+  def __init__(self, openid, nick_name, gender, language, city, province, country, avatar_url, phone=None):
+    self.openid = openid
+    self.nick_name = nick_name
+    self.gender = gender
+    self.language = language
+    self.city = city
+    self.province = province
+    self.country = country
+    self.avatar_url = avatar_url
+    self.phone = phone

@@ -1,4 +1,4 @@
-from ..models import City, IndexPage, CityPage, HomePage, UnmatchedPlace, FeedBack
+from ..models import City, IndexPage, CityPage, HomePage, UnmatchedPlace, FeedBack, User
 from index import app, db
 from flask import jsonify
 from sqlalchemy import and_
@@ -102,3 +102,34 @@ class QueryHelper(object):
       app.logger.error(sys._getframe().f_code.co_name + str(e))
       return False
     return True
+
+  @classmethod
+  def get_wechat_sessionkey_and_openid(cls, code):
+    querystring = {
+      'appid': app.config['WECHAT_APP_ID'],
+      'secret': app.config['WECHAT_APP_SECRET'],
+      'js_code': code,
+      'grant_type': app.config['WECHAT_APP_GRANT_TYPE']
+      }
+    response = requests.request("GET", app.config['WECHAT_APP_CODE_URL'], params=querystring)
+    return json.loads(response.text)
+
+  @classmethod
+  def get_user_with_openid(cls, openid):
+    return User.query.filter_by(openid=openid).first()
+
+  @classmethod
+  def add_user(cls, openid, nick_name, gender, language, city, province, country, avatar_url, phone=None):
+    user = cls.get_user_with_openid(openid=openid)
+    if user:
+      return user
+    try:
+      user = User(openid=openid, nick_name=nick_name, gender=gender,
+        language=language, city=city, province=province, country=country, 
+        avatar_url=avatar_url, phone=phone)
+      db.session.add(user)
+      db.session.commit()
+    except (DataError, IntegrityError), e:
+      app.logger.error(sys._getframe().f_code.co_name + str(e))
+      return None
+    return user

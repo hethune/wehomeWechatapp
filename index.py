@@ -4,6 +4,7 @@ from config import BaseConfig
 import logging
 app = Flask(__name__)
 app.config.from_object(BaseConfig)
+app.secret_key = app.config['APP_SECRET_KEY']
 db = SQLAlchemy(app)
 # logger
 
