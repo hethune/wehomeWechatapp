@@ -1,4 +1,4 @@
-from ..models import City, IndexPage, CityPage, HomePage, UnmatchedPlace, FeedBack, User
+from ..models import City, IndexPage, CityPage, HomePage, UnmatchedPlace, FeedBack, User, Phone
 from index import app, db
 from flask import jsonify
 from sqlalchemy import and_
@@ -133,3 +133,25 @@ class QueryHelper(object):
       app.logger.error(sys._getframe().f_code.co_name + str(e))
       return None
     return user
+
+  @classmethod
+  def get_phone_with_phone_and_country(cls, phone, country):
+    return Phone.query.filter_by(phone=phone, country=country).first()
+
+  @classmethod
+  def add_or_set_phone(cls, phone_nu, country, verification_code, verification_code_created_at, is_verified=False):
+    phone = cls.get_phone_with_phone_and_country(phone=phone_nu, country=country)
+    try:
+      if not phone:
+        phone = Phone(phone_nu, country, verification_code,
+          verification_code_created_at, is_verified)
+      else:
+        phone.phone, phone.country = phone_nu, country
+        phone.verification_code, is_verified = is_verified
+        phone.verification_code_created_at = verification_code_created_at
+      db.session.merge(phone)
+      db.session.commit()
+    except (DataError, IntegrityError), e:
+      app.logger.error(sys._getframe().f_code.co_name + str(e))
+      return None
+    return phone

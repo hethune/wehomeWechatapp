@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 from .models import City
 from index import app, db
-from .utils.helper import uuid_gen, json_validate, requires_token, generate_token, verify_token, requires_auth
+from .utils.helper import uuid_gen, json_validate, requires_token, generate_token, verify_token, requires_auth, id_generator
 from .utils.query import QueryHelper
 from flask import request, jsonify, session
 import json
+import tasks
+import datetime
 
 logger = app.logger
+HALF_MINUTE = 30
 
 @app.route('/api/index_page', methods=['POST'])
 @uuid_gen
@@ -166,12 +169,33 @@ def login():
         message='Failed to login'), 409
   # if not fill the phone number then send sms message and validate
   if not user.phone:
-    # todo send sms message
-    pass
+    return jsonify(success=False, status=0,
+      message='Phone not verifed'), 409
 
-  third_session = generate_token(user)
+  third_session = generate_token(user, result['session_key'])
   session[str(user.id)] = third_session
   return jsonify(success=True, third_session=session[str(user.id)])
+
+@app.route("/api/send_mobile_code", methods=["POST"])
+@uuid_gen
+@json_validate(filter=['token', 'phone', 'country'])
+@requires_token
+def send_mobile_code():
+  incoming = request.get_json()
+  verification_code = id_generator()
+  phone = QueryHelper.get_phone_with_phone_and_country(phone=incoming["phone"], country=incoming["country"])
+  if phone:
+    if phone.verification_code_created_at \
+      and phone.verification_code_created_at + datetime.timedelta(seconds=HALF_MINUTE) > datetime.datetime.utcnow():
+      logger.warning("{} is sending sms code too frequently".format(incoming["phone"]))
+      return jsonify(message="Trying too frequent"), 409
+
+  QueryHelper.add_or_set_phone(phone_nu=incoming['phone'], country=incoming['country'],
+    verification_code=verification_code, verification_code_created_at=datetime.datetime.utcnow())
+
+  # send_sms async
+  tasks.send_sms_mobilecode.apply_async((incoming["phone"], incoming["country"], verification_code))
+  return jsonify(success=True)
 
 @app.route('/ping', methods=['GET'])
 def ping():

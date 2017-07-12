@@ -1,5 +1,7 @@
 import uuid
 import flask
+import string
+import random
 from functools import wraps, partial
 from flask import request, jsonify, g, session
 from index import app
@@ -57,12 +59,13 @@ def requires_auth(f=None):
     return jsonify(message="Authorization is required to access this resource"), 401
   return decorated
 
-def generate_token(user, expiration=TWO_HOURS):
+def generate_token(user, session_key, expiration=TWO_HOURS):
   s = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
   token = s.dumps({
     'id': user.id,
     'phone': user.phone,
     'nick_name': user.nick_name,
+    'session_key': session_key
   }).decode('utf-8')
   return token
 
@@ -73,3 +76,6 @@ def verify_token(token):
   except (BadSignature, SignatureExpired):
     return None
   return data
+
+def id_generator(size=6, chars=string.digits):
+  return ''.join(random.choice(chars) for x in range(size))
