@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from .models import City
 from index import app, db
-from .utils.helper import uuid_gen, json_validate, requires_auth
+from .utils.helper import uuid_gen, json_validate, requires_auth, generate_token, verify_token
 from .utils.query import QueryHelper
-from flask import request, jsonify
+from flask import request, jsonify, session
 import json
 
 logger = app.logger
@@ -138,6 +138,37 @@ def set_feedback():
       message='Failed to set feed back'), 409
   return jsonify(success=True,
       message='Success to set feed back')
+
+@app.route('/api/login', methods=['POST'])
+@uuid_gen
+@json_validate(filter=['token', 'code', 'rawdata'])
+def login():
+  incoming = request.get_json()
+  # get wechat sssion key and openid
+  result = QueryHelper.get_wechat_sessionkey_and_openid(incoming['code'])
+  if not result.get('session_key', None):
+    logger.error('Failed to login')
+    return jsonify(success=False,
+      message='Failed to login'), 409
+
+  # if not register then regist and return 3rd_session
+  user = QueryHelper.get_user_with_openid(result['openid'])
+  if not user:
+    user = QueryHelper.add_user(openid=result['openid'], nick_name=incoming['rawdata']['nickName'],
+      gender=incoming['rawdata']['gender'], language=incoming['rawdata']['language'], city=incoming['rawdata']['city'],
+      province=incoming['rawdata']['province'], country=incoming['rawdata']['country'], avatar_url=incoming['rawdata']['avatarUrl'])
+    if not user:
+      logger.error('Failed to login')
+      return jsonify(success=False,
+        message='Failed to login'), 409
+  # if not fill the phone number then send sms message and validate
+  if not user.phone:
+    # todo send sms message
+    pass
+
+  third_session = generate_token(user)
+  session[str(user.id)] = third_session
+  return jsonify(success=True, third_session=session[str(user.id)])
 
 @app.route('/ping', methods=['GET'])
 def ping():

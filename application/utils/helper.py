@@ -3,6 +3,10 @@ import flask
 from functools import wraps, partial
 from flask import request, jsonify
 from index import app
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from itsdangerous import SignatureExpired, BadSignature
+
+TWO_HOURS = 60*60*2
 
 def uuid_gen(f):
   @wraps(f)
@@ -38,3 +42,20 @@ def requires_auth(f=None):
       return f(*args, **kwargs)
     return jsonify(message="Authentication is required to access this resource"), 401
   return decorated
+
+def generate_token(user, expiration=TWO_HOURS):
+  s = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
+  token = s.dumps({
+    'id': user.id,
+    'phone': user.phone,
+    'nick_name': user.nick_name,
+  }).decode('utf-8')
+  return token
+
+def verify_token(token):
+  s = Serializer(app.config['SECRET_KEY'])
+  try:
+    data = s.loads(token)
+  except (BadSignature, SignatureExpired):
+    return None
+  return data
