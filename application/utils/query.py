@@ -1,4 +1,4 @@
-from ..models import City, IndexPage, CityPage, HomePage, UnmatchedPlace
+from ..models import City, IndexPage, CityPage, HomePage, UnmatchedPlace, FeedBack
 from index import app, db
 from flask import jsonify
 from sqlalchemy import and_
@@ -91,3 +91,14 @@ class QueryHelper(object):
     except Exception as e:
       return place_name
     return place_name
+
+  @classmethod
+  def add_feed_back(cls, content):
+    try:
+      fb = FeedBack(content=content)
+      db.session.add(fb)
+      db.session.commit()
+    except (DataError, IntegrityError), e:
+      app.logger.error(sys._getframe().f_code.co_name + str(e))
+      return False
+    return True
