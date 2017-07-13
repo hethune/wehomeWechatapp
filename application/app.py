@@ -3,13 +3,16 @@ from .models import City
 from index import app, db
 from .utils.helper import uuid_gen, json_validate, requires_token, generate_token, verify_token, requires_auth, id_generator
 from .utils.query import QueryHelper
-from flask import request, jsonify, session, g
+from .utils.cache import RedisCache
+from flask import request, jsonify, g
 import json
 from tasks import send_sms_mobilecode
 import datetime
+from index import session
 
 logger = app.logger
 HALF_MINUTE = 30
+
 
 @app.route('/api/index_page', methods=['POST'])
 @uuid_gen
@@ -173,7 +176,6 @@ def login():
   if not user.phone:
     return jsonify(success=False, status=0, user_id=user.id,
       message='Phone not verifed', third_session=session[str(user.id)])
-
   return jsonify(success=True, user_id=user.id, third_session=session[str(user.id)])
 
 @app.route("/api/send_mobile_code", methods=["POST"])
