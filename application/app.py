@@ -104,6 +104,7 @@ def home_page():
       return jsonify(success=False,
         message="Failed to get home page list we cant't find the given place"), 409
 
+    d['id'] = home_page.id
     d['neighborhood_trend'] = json.loads(home_page.neighborhood.house_price_trend) if home_page.neighborhood.house_price_trend else None
     d['neighborhood_rent_radio']= home_page.neighborhood.neighbor_rental_radio if home_page.neighborhood else None
     d['neighborhood_score'] = home_page.neighborhood.neighborhood_score if home_page.neighborhood else None
