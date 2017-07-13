@@ -3,10 +3,12 @@ import flask
 import string
 import random
 from functools import wraps, partial
-from flask import request, jsonify, g, session
+from flask import request, jsonify, g 
+from index import session
 from index import app
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous import SignatureExpired, BadSignature
+from index import session
 
 TWO_HOURS = 60*60*2
 
