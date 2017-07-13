@@ -267,12 +267,12 @@ def get_collections():
   return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
 
 
-@app.route('/api/det_collection', methods=['POST'])
+@app.route('/api/del_collection', methods=['POST'])
 @uuid_gen
 @json_validate(filter=['home_id', 'token', 'third_session'])
 @requires_token
 @requires_auth
-def det_collection():
+def del_collection():
   incoming = request.get_json()
   is_success = QueryHelper.del_collection(user_id=g.current_user['id'], home_id=incoming['home_id'])
   if not is_success:
