@@ -53,7 +53,7 @@ def requires_auth(f=None):
     incoming = request.get_json()
     third_session = incoming['third_session']
     user = verify_token(third_session)
-    if user and session[str(user['id'])]==third_session:
+    if user and len(session)>0 and session[str(user['id'])]==third_session:
       g.current_user = user
       return f(*args, **kwargs)
     return jsonify(message="Authorization is required to access this resource"), 401

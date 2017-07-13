@@ -92,6 +92,7 @@ class HomePage(db.Model):
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
   neighborhood = relationship("Neighborhood", back_populates="homepages")
   city = relationship("City", back_populates="homepages")
+  collections = relationship("Collection", back_populates="homepage")
 
   __table_args__ = (
     db.Index("idx_longitude_latitude", "longitude", "latitude"),
@@ -129,7 +130,7 @@ class FeedBack(db.Model):
 class User(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
   phone = db.Column(db.String(255), index=True)
-  openid = db.Column(db.String(64), index=True)
+  openid = db.Column(db.String(64), index=True, unique=True)
   nick_name= db.Column(db.String(255))
   gender = db.Column(db.Integer)
   language = db.Column(db.String(255), index=True)
@@ -161,6 +162,7 @@ class Phone(db.Model):
   is_verified = db.Column(db.Boolean(), index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
+
   __table_args__ = (
     db.Index("idx_phone", "phone"),
     db.Index("idx_phone_country", "phone", "country"),
@@ -173,3 +175,21 @@ class Phone(db.Model):
     self.verification_code = verification_code
     self.verification_code_created_at = verification_code_created_at
     self.is_verified = is_verified
+
+class Collection(db.Model):
+  id = db.Column(db.Integer(), index=True, primary_key=True)
+  user_id = db.Column(db.Integer(), db.ForeignKey("user.id", ondelete="CASCADE"), index=True, nullable=False)
+  home_id = db.Column(db.Integer(), db.ForeignKey("home_page.id", ondelete="CASCADE"), index=True, nullable=False)
+  is_active = db.Column(db.Boolean(), default=False)
+  created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
+  updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
+  homepage = relationship("HomePage", back_populates="collections")
+
+  def __init__(self, user_id, home_id, is_active=True):
+    self.user_id = user_id
+    self.home_id = home_id
+    self.is_active = is_active
+
+  __table_args__ = (
+    db.Index("idx_user_id_home_id", "user_id", "home_id"),
+  )
