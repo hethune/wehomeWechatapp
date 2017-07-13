@@ -5,7 +5,7 @@ from .utils.helper import uuid_gen, json_validate, requires_token, generate_toke
 from .utils.query import QueryHelper
 from flask import request, jsonify, session
 import json
-import tasks
+from tasks import send_sms_mobilecode
 import datetime
 
 logger = app.logger
@@ -158,23 +158,23 @@ def login():
       message='Failed to login'), 409
 
   # if not register then regist and return 3rd_session
-  user = QueryHelper.get_user_with_openid(result['openid'])
+  user = QueryHelper.add_or_set_user(openid=result['openid'], nick_name=incoming['rawdata']['nickName'],
+    gender=incoming['rawdata']['gender'], language=incoming['rawdata']['language'], city=incoming['rawdata']['city'],
+    province=incoming['rawdata']['province'], country=incoming['rawdata']['country'], avatar_url=incoming['rawdata']['avatarUrl'])
   if not user:
-    user = QueryHelper.add_user(openid=result['openid'], nick_name=incoming['rawdata']['nickName'],
-      gender=incoming['rawdata']['gender'], language=incoming['rawdata']['language'], city=incoming['rawdata']['city'],
-      province=incoming['rawdata']['province'], country=incoming['rawdata']['country'], avatar_url=incoming['rawdata']['avatarUrl'])
-    if not user:
-      logger.error('Failed to login')
-      return jsonify(success=False,
-        message='Failed to login'), 409
+    logger.error('Failed to login')
+    return jsonify(success=False,
+      message='Failed to login'), 409
   # if not fill the phone number then send sms message and validate
-  if not user.phone:
-    return jsonify(success=False, status=0,
-      message='Phone not verifed'), 409
 
   third_session = generate_token(user, result['session_key'])
   session[str(user.id)] = third_session
-  return jsonify(success=True, third_session=session[str(user.id)])
+
+  if not user.phone:
+    return jsonify(success=False, status=0, user_id=user.id,
+      message='Phone not verifed', third_session=session[str(user.id)])
+
+  return jsonify(success=True, user_id=user.id, third_session=session[str(user.id)])
 
 @app.route("/api/send_mobile_code", methods=["POST"])
 @uuid_gen
@@ -194,8 +194,27 @@ def send_mobile_code():
     verification_code=verification_code, verification_code_created_at=datetime.datetime.utcnow())
 
   # send_sms async
-  tasks.send_sms_mobilecode.apply_async((incoming["phone"], incoming["country"], verification_code))
+  send_sms_mobilecode.apply_async((incoming["phone"], incoming["country"], verification_code))
   return jsonify(success=True)
+
+@app.route("/api/verify_mobile_code", methods=["POST"])
+@uuid_gen
+@json_validate(filter=['token', 'phone', 'country', 'code', 'user_id'])
+@requires_token
+def verify_mobile_code():
+  incoming = request.get_json()
+  if not QueryHelper.verify_sms_code(phone=incoming['phone'], country=incoming['country'], code=incoming['code']):
+    logger.error('Verify the sms code failed')
+    return jsonify(success=False, message='Verify the sms code failed')
+
+  user = QueryHelper.get_user_with_id(user_id=incoming['user_id'])
+  is_phone_success = QueryHelper.set_user_phone_with_id(user_id=incoming['user_id'], phone=incoming['phone'], country_code=incoming['country'])
+  is_code_success = QueryHelper.set_phone_is_verified(phone=incoming['phone'], country=incoming['country'])
+  if not is_phone_success or not is_code_success:
+    logger.error('Verify the sms code failed')
+    return jsonify(success=False, message='Verify the sms code failed')
+
+  return jsonify(success=True, message='Verify the sms code successfully')
 
 @app.route('/ping', methods=['GET'])
 def ping():
