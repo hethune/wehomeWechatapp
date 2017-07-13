@@ -207,6 +207,10 @@ class CityCount(db.Model):
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
+  __table_args__ = (
+    db.Index("idx_city_id_date", "city_id", "date"),
+  )
+
 class CityRankingList(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
   city_id = db.Column(db.Integer(), db.ForeignKey("city.id", ondelete="CASCADE"), index=True, nullable=False)
