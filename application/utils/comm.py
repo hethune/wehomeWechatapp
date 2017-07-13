@@ -58,7 +58,7 @@ class Notification(object):
   @classmethod
   def send_sms_nexmo(cls, **kwargs):
     print kwargs
-    text = cls.gen_sms_phone_code_message(**kwargs)
+    text = cls.gen_sms_phone_code_message(**kwargs).format(kwargs.get('text', None))
     params = {
       'api_key': app.config.get("NEXMO_KEY"),
       'api_secret': app.config.get("NEXMO_SECRET"),

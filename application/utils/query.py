@@ -1,4 +1,4 @@
-from ..models import City, IndexPage, CityPage, HomePage, UnmatchedPlace, FeedBack, User, Phone
+from ..models import City, IndexPage, CityPage, HomePage, UnmatchedPlace, FeedBack, User, Phone, Collection
 from index import app, db
 from flask import jsonify
 from sqlalchemy import and_
@@ -8,6 +8,7 @@ import requests
 import json
 from sqlalchemy.exc import DataError, IntegrityError
 import datetime
+import sys
 
 FIVE_MINUTES = 60*5
 
@@ -204,3 +205,41 @@ class QueryHelper(object):
       app.logger.error(sys._getframe().f_code.co_name + str(e))
       return False
     return True
+
+  @classmethod
+  def get_collection_with_user_home(cls, user_id, home_id):
+    return Collection.query.filter(and_(Collection.user_id==user_id, Collection.home_id==home_id)).first()
+
+  @classmethod
+  def set_collection(cls, user_id, home_id):
+    collection = cls.get_collection_with_user_home(user_id=user_id, home_id=home_id)
+    if not collection:
+      collection = Collection(user_id=user_id, home_id=home_id)
+    else:
+      collection.is_active = True
+
+    try:
+      db.session.merge(collection)
+      db.session.commit()
+    except (DataError, IntegrityError), e:
+      app.logger.error(sys._getframe().f_code.co_name + str(e))
+      return None
+    return cls.get_collection_with_user_home(user_id=user_id, home_id=home_id)
+
+  @classmethod
+  def del_collection(cls, user_id, home_id):
+    collection = cls.get_collection_with_user_home(user_id=user_id, home_id=home_id)
+    if not collection:
+      return False
+    collection.is_active = False
+    try:
+      db.session.merge(collection)
+      db.session.commit()
+    except (DataError, IntegrityError), e:
+      app.logger.error(sys._getframe().f_code.co_name + str(e))
+      return False
+    return True
+
+  @classmethod
+  def get_collections_with_user(cls, user_id):
+    return Collection.query.filter(and_(Collection.user_id==user_id, Collection.is_active==True)).all()

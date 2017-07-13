@@ -136,7 +136,6 @@ def home_page():
 @requires_auth
 def set_feedback():
   incoming = request.get_json()
-  print g.current_user
   is_success = QueryHelper.add_feed_back(content=incoming['content'], user_id=g.current_user['id'])
   if not is_success:
     logger.error('Failed to set feed back')
@@ -220,3 +219,60 @@ def verify_mobile_code():
 @app.route('/ping', methods=['GET'])
 def ping():
   return 'pong'
+
+@app.route('/api/set_collection', methods=['POST'])
+@uuid_gen
+@json_validate(filter=['home_id', 'token', 'third_session'])
+@requires_token
+@requires_auth
+def set_collection():
+  incoming = request.get_json()
+  is_success = QueryHelper.set_collection(user_id=g.current_user['id'], home_id=incoming['home_id'])
+  if not is_success:
+    logger.error('Failed to set collection user: {user_id} home: {home_id}'.format(
+      user_id=g.current_user['id'], home_id=incoming['home_id']))
+    return jsonify(success=False,
+      message='Failed to set collection'), 409
+  return jsonify(success=True,
+      message='Success to set cllection')
+
+@app.route('/api/get_collections', methods=['POST'])
+@uuid_gen
+@json_validate(filter=['token', 'third_session'])
+@requires_token
+@requires_auth
+def get_collections():
+  incoming = request.get_json()
+  columns = ['map_box_place_name', 'score']
+  d = {}
+  l = []
+  try:
+    collections = QueryHelper.get_collections_with_user(user_id=g.current_user['id'])
+    for item in collections:
+      l.append({
+        'map_box_place_name': item.homepage.map_box_place_name,
+        'score': item.homepage.score
+        })
+    d['collections'] = l
+  except Exception as e:
+    logger.error("Failed to get collecions list {}".format(e))
+    return jsonify(success=False,
+      message='Failed to get collecions list')
+  return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
+
+
+@app.route('/api/det_collection', methods=['POST'])
+@uuid_gen
+@json_validate(filter=['home_id', 'token', 'third_session'])
+@requires_token
+@requires_auth
+def det_collection():
+  incoming = request.get_json()
+  is_success = QueryHelper.del_collection(user_id=g.current_user['id'], home_id=incoming['home_id'])
+  if not is_success:
+    logger.error('Failed to del collection user: {user_id} home: {home_id}'.format(
+      user_id=g.current_user['id'], home_id=incoming['home_id']))
+    return jsonify(success=False,
+      message='Failed to del collection'), 409
+  return jsonify(success=True,
+      message='Success to del cllection')
