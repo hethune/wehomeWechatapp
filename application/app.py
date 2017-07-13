@@ -57,7 +57,7 @@ def city_page():
     'two_room_two_toilet', 'three_room_two_toilet', 'rental_radio', 'house_price_trend', 'increase_radio',
     'rental_income_radio', 'list_average_price', 'deal_average_price', 'city_name', 'one_bed_one_bath_lower_bound',
     'one_bed_one_bath_upper_bound', 'two_bed_two_bath_lower_bound', 'two_bed_two_bath_upper_bound', 'three_bed_two_bath_lower_bound',
-    'three_bed_two_bath_upper_bound']
+    'three_bed_two_bath_upper_bound', 'block_villa_median', 'block_apartment_median']
   d = {}
   try:
     incoming = request.get_json()
