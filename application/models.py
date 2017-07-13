@@ -136,6 +136,7 @@ class User(db.Model):
   city = db.Column(db.String(255), index=True)
   province = db.Column(db.String(255), index=True)
   country = db.Column(db.String(255), index=True)
+  country_code = db.Column(db.String(16), index=True)
   avatar_url = db.Column(db.String(1024))
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)

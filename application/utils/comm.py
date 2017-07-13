@@ -19,7 +19,7 @@ class Notification(object):
 
   @classmethod
   def send_sms_cn(cls, **kwargs):
-    text = cls.gen_sms_phone_code_message(**kwargs)
+    text = cls.gen_sms_phone_code_message(**kwargs).format(kwargs.get('text', None))
     apikey = app.config['YUNPIAN_KEY']
     sms_host = "sms.yunpian.com"
     port = 443

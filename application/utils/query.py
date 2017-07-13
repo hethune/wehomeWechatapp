@@ -6,6 +6,10 @@ import hashlib
 from urllib import quote_plus
 import requests
 import json
+from sqlalchemy.exc import DataError, IntegrityError
+import datetime
+
+FIVE_MINUTES = 60*5
 
 class QueryHelper(object):
   'You can use this class query the complex query via the SqlAlchemy query'
@@ -119,20 +123,24 @@ class QueryHelper(object):
     return User.query.filter_by(openid=openid).first()
 
   @classmethod
-  def add_user(cls, openid, nick_name, gender, language, city, province, country, avatar_url, phone=None):
+  def add_or_set_user(cls, openid, nick_name, gender, language, city, province, country, avatar_url, phone=None):
     user = cls.get_user_with_openid(openid=openid)
     if user:
-      return user
-    try:
+      user.nick_name, user.gender = nick_name, gender
+      user.language, user.city = language, city
+      user.province, user.country = province, country
+      user.avatar_url = avatar_url
+    else:
       user = User(openid=openid, nick_name=nick_name, gender=gender,
         language=language, city=city, province=province, country=country, 
         avatar_url=avatar_url, phone=phone)
-      db.session.add(user)
+    try:
+      db.session.merge(user)
       db.session.commit()
     except (DataError, IntegrityError), e:
       app.logger.error(sys._getframe().f_code.co_name + str(e))
       return None
-    return user
+    return cls.get_user_with_openid(openid=openid)
 
   @classmethod
   def get_phone_with_phone_and_country(cls, phone, country):
@@ -147,7 +155,7 @@ class QueryHelper(object):
           verification_code_created_at, is_verified)
       else:
         phone.phone, phone.country = phone_nu, country
-        phone.verification_code, is_verified = is_verified
+        phone.verification_code, phone.is_verified = verification_code, is_verified
         phone.verification_code_created_at = verification_code_created_at
       db.session.merge(phone)
       db.session.commit()
@@ -155,3 +163,44 @@ class QueryHelper(object):
       app.logger.error(sys._getframe().f_code.co_name + str(e))
       return None
     return phone
+
+  @classmethod
+  def get_phone_with_phone_and_country(cls, phone, country):
+    return Phone.query.filter(and_(Phone.phone==phone, Phone.country==country)).first()
+
+  @classmethod
+  def verify_sms_code(cls, phone, country, code, expiration=FIVE_MINUTES):
+    phone = cls.get_phone_with_phone_and_country(phone, country)
+    if phone and phone.verification_code == code \
+        and phone.verification_code_created_at + datetime.timedelta(seconds=expiration) > datetime.datetime.utcnow():
+      return True 
+    return False
+
+  @classmethod
+  def get_user_with_id(cls, user_id):
+    return User.query.filter_by(id=user_id).first()
+
+  @classmethod
+  def set_user_phone_with_id(cls, user_id, phone, country_code, is_verified=True):
+    user = cls.get_user_with_id(user_id=user_id)
+    try:
+      user.phone = phone
+      user.country_code = country_code
+      db.session.merge(user)
+      db.session.commit()
+    except (DataError, IntegrityError), e:
+      app.logger.error(sys._getframe().f_code.co_name + str(e))
+      return False
+    return True
+
+  @classmethod
+  def set_phone_is_verified(cls, phone, country):
+    phone = cls.get_phone_with_phone_and_country(phone=phone, country=country)
+    try:
+      phone.is_verified = True
+      db.session.merge(phone)
+      db.session.commit()
+    except (DataError, IntegrityError), e:
+      app.logger.error(sys._getframe().f_code.co_name + str(e))
+      return False
+    return True
