@@ -195,3 +195,30 @@ class Collection(db.Model):
   __table_args__ = (
     db.Index("idx_user_id_home_id", "user_id", "home_id"),
   )
+
+class CityCount(db.Model):
+  id = db.Column(db.Integer(), index=True, primary_key=True)
+  city_id = db.Column(db.Integer(), db.ForeignKey("city.id", ondelete="CASCADE"), index=True, nullable=False)
+  today_sale_online = db.Column(db.Integer())
+  today_sale_offline = db.Column(db.Integer())
+  today_rent_online = db.Column(db.Integer())
+  today_rent_offline = db.Column(db.Integer())
+  date = db.Column(db.Date(), nullable=False, index=True)
+  created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
+  updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
+
+class CityRankingList(db.Model):
+  id = db.Column(db.Integer(), index=True, primary_key=True)
+  city_id = db.Column(db.Integer(), db.ForeignKey("city.id", ondelete="CASCADE"), index=True, nullable=False)
+  home_id = db.Column(db.Integer(), db.ForeignKey("home_page.id", ondelete="CASCADE"), index=True, nullable=False)
+  date = db.Column(db.Date(), nullable=False, index=True)
+  created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
+  updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
+
+class TotalRankingList(db.Model):
+  id = db.Column(db.Integer(), index=True, primary_key=True)
+  city_id = db.Column(db.Integer(), db.ForeignKey("city.id", ondelete="CASCADE"), index=True, nullable=False)
+  home_id = db.Column(db.Integer(), db.ForeignKey("home_page.id", ondelete="CASCADE"), index=True, nullable=False)
+  date = db.Column(db.Date(), nullable=False, index=True)
+  created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
+  updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
