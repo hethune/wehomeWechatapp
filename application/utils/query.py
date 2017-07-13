@@ -243,3 +243,7 @@ class QueryHelper(object):
   @classmethod
   def get_collections_with_user(cls, user_id):
     return Collection.query.filter(and_(Collection.user_id==user_id, Collection.is_active==True)).all()
+
+  @classmethod
+  def get_city_count_with_date_and_city(cls, city_id, date):
+    return CityCount.query.filter(and_(CityCount.city_id==city_id, CityCount.date==date)).first()
