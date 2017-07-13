@@ -88,7 +88,8 @@ def home_page():
   incoming = request.get_json()
   columns = ['map_box_place_name', 'score', 'house_price_dollar', 'exchange_rate',
     'rent', 'rental_radio', 'increase_radio', 'rental_income_radio',
-    'neighborhood_rent_radio', 'city_name', 'city_trend', 'neighborhood_trend']
+    'neighborhood_rent_radio', 'city_name', 'city_trend', 'neighborhood_trend',
+    'adjust_score', 'property_score', 'neighborhood_score']
   d = {}
   place_name = incoming['place_name']
   try:
@@ -104,7 +105,8 @@ def home_page():
         message="Failed to get home page list we cant't find the given place"), 409
 
     d['neighborhood_trend'] = json.loads(home_page.neighborhood.house_price_trend) if home_page.neighborhood.house_price_trend else None
-    d['neighborhood_rent_radio']= home_page.neighborhood.neighbor_rental_radio
+    d['neighborhood_rent_radio']= home_page.neighborhood.neighbor_rental_radio if home_page.neighborhood else None
+    d['neighborhood_score'] = home_page.neighborhood.neighborhood_score if home_page.neighborhood else None
     d['city_trend'] = json.loads(home_page.city.citypage.house_price_trend) if home_page.city and home_page.city.citypage and home_page.city.citypage.house_price_trend else None
     d['city_name'] = home_page.city.city_name if home_page.city else None
     d['exchange_rate'] = QueryHelper.get_index_page().exchange_rate
