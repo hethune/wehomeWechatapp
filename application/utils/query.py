@@ -1,4 +1,4 @@
-from ..models import City, IndexPage, CityPage, HomePage, UnmatchedPlace, FeedBack, User, Phone, Collection
+from ..models import City, IndexPage, CityPage, HomePage, UnmatchedPlace, FeedBack, User, Phone, Collection, CityCount, CityRankingList, TotalRankingList
 from index import app, db
 from flask import jsonify
 from sqlalchemy import and_
