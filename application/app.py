@@ -3,7 +3,7 @@ from .models import City
 from index import app, db
 from .utils.helper import uuid_gen, json_validate, requires_token, generate_token, verify_token, requires_auth, id_generator
 from .utils.query import QueryHelper
-from flask import request, jsonify, session
+from flask import request, jsonify, session, g
 import json
 from tasks import send_sms_mobilecode
 import datetime
@@ -78,7 +78,7 @@ def city_page():
 
 @app.route('/api/home_page', methods=['POST'])
 @uuid_gen
-@json_validate(filter=['place_name', 'token'])
+@json_validate(filter=['place_name', 'token', 'third_session'])
 @requires_token
 @requires_auth
 def home_page():
@@ -131,12 +131,13 @@ def home_page():
 
 @app.route('/api/set_feedback', methods=['POST'])
 @uuid_gen
-@json_validate(filter=['content', 'token'])
+@json_validate(filter=['content', 'token', 'third_session'])
 @requires_token
 @requires_auth
 def set_feedback():
   incoming = request.get_json()
-  is_success = QueryHelper.add_feed_back(content=incoming['content'])
+  print g.current_user
+  is_success = QueryHelper.add_feed_back(content=incoming['content'], user_id=g.current_user['id'])
   if not is_success:
     logger.error('Failed to set feed back')
     return jsonify(success=False,

@@ -97,9 +97,9 @@ class QueryHelper(object):
     return place_name
 
   @classmethod
-  def add_feed_back(cls, content):
+  def add_feed_back(cls, content, user_id):
     try:
-      fb = FeedBack(content=content)
+      fb = FeedBack(content=content, user_id=user_id)
       db.session.add(fb)
       db.session.commit()
     except (DataError, IntegrityError), e:

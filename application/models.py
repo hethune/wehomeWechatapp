@@ -15,7 +15,6 @@ class City(db.Model):
 
 class Neighborhood(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
-  # city_id = db.Column(db.Integer(), db.ForeignKey("city.id", ondelete="CASCADE"), index=True, nullable=False)
   neighbor_name = db.Column(db.Text())
   neighbor_rental_radio = db.Column(db.Float())
   house_price_trend = db.Column(db.Text())
@@ -23,7 +22,6 @@ class Neighborhood(db.Model):
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
   homepages = relationship("HomePage", back_populates="neighborhood")
-  # city = relationship("City", back_populates="neighborhoods")
 
 class IndexPage(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
@@ -119,12 +117,14 @@ class UnmatchedPlace(db.Model):
 
 class FeedBack(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
+  user_id = db.Column(db.Integer(), db.ForeignKey("user.id", ondelete="CASCADE"), index=True)
   content = db.Column(db.Text(), index=True, nullable=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
-  def __init__(self, content):
+  def __init__(self, content, user_id):
     self.content = content
+    self.user_id = user_id
 
 class User(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
