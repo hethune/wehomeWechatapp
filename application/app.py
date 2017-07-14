@@ -88,10 +88,62 @@ def city_page():
 
 @app.route('/api/home_page', methods=['POST'])
 @uuid_gen
+@json_validate(filter=['place_name', 'token'])
+@requires_token
+def home_page():
+  incoming = request.get_json()
+  columns = ['map_box_place_name', 'score', 'house_price_dollar', 'exchange_rate',
+    'rent', 'rental_radio', 'increase_radio', 'rental_income_radio',
+    'neighborhood_rent_radio', 'city_name', 'city_trend', 'neighborhood_trend']
+  d = {}
+  place_name = incoming['place_name']
+  try:
+    if app.config['IS_PARSE_ADDRESS']:
+      place_name = QueryHelper.parse_address_by_map_box(place_name=place_name)
+
+    
+    home_page = QueryHelper.get_home_page_with_place_name(place_name=place_name)
+    if not home_page:
+      QueryHelper.add_unmatched_place(place_name=incoming['place_name'], type='map_box_place_name')
+      logger.error("Failed to get home page list we cant't find the given place")
+      return jsonify(success=False,
+        message="Failed to get home page list we cant't find the given place"), 409
+
+    d['neighborhood_trend'] = json.loads(home_page.neighborhood.house_price_trend) if home_page.neighborhood.house_price_trend else None
+    d['neighborhood_rent_radio']= home_page.neighborhood.neighbor_rental_radio
+    d['city_trend'] = json.loads(home_page.city.citypage.house_price_trend) if home_page.city and home_page.city.citypage and home_page.city.citypage.house_price_trend else None
+    d['city_name'] = home_page.city.city_name if home_page.city else None
+    d['exchange_rate'] = QueryHelper.get_index_page().exchange_rate
+    d['home_page'] = home_page
+
+    # log the none value
+    validate_d = {
+      'score': home_page.score,
+      'house_price_dollar': home_page.house_price_dollar,
+      'rent': home_page.rent,
+      'rental_radio': home_page.rental_radio,
+      'increase_radio': home_page.increase_radio,
+      'rental_income_radio': home_page.rental_income_radio,
+      'neighborhood_rent_radio': home_page.neighborhood.neighbor_rental_radio,
+      'city_trend': d['city_trend'],
+      'neighborhood_trend': d['neighborhood_trend']
+    }
+    for k, v in validate_d.items():
+      if not v:
+        QueryHelper.add_unmatched_place(place_name=incoming['place_name'], type=k)
+
+  except Exception as e:
+    logger.error("Failed to get home page list {}".format(e))
+    return jsonify(success=False,
+      message='Failed to get home page list'), 409
+  return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
+
+@app.route('/api/v2/home_page', methods=['POST'])
+@uuid_gen
 @json_validate(filter=['token', 'third_session'])
 @requires_token
 @requires_auth
-def home_page():
+def v2_home_page():
   incoming = request.get_json()
   columns = ['map_box_place_name', 'score', 'house_price_dollar', 'exchange_rate',
     'rent', 'rental_radio', 'increase_radio', 'rental_income_radio',
