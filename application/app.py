@@ -296,7 +296,8 @@ def del_collection():
 @requires_token
 def get_city_ranking_list():
   incoming = request.get_json()
-  columns = ['score', 'rental_radio', 'increase_radio', 'map_box_place_name', 'house_price_dollar', 'pic_url']
+  columns = ['score', 'rental_radio', 'increase_radio', 'map_box_place_name', 'house_price_dollar',
+    'pic_url', 'city_name']
   d = {}
   l = []
   try:
@@ -308,7 +309,8 @@ def get_city_ranking_list():
         'increase_radio': item.home.increase_radio,
         'map_box_place_name': item.home.map_box_place_name,
         'house_price_dollar': item.home.house_price_dollar,
-        'pic_url': item.pic_url
+        'pic_url': item.pic_url,
+        'city_name': item.city.city_name
         })
     d['city_ranking_list'] = l
   except Exception as e:

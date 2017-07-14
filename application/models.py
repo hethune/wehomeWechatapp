@@ -12,6 +12,7 @@ class City(db.Model):
   # neighborhoods = relationship("Neighborhood", back_populates="city")
   homepages = relationship("HomePage", back_populates="city")
   citypage = relationship("CityPage", back_populates="city", uselist=False)
+  city_ranking_list = relationship("CityRankingList", back_populates="city")
 
 class Neighborhood(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
@@ -228,6 +229,7 @@ class CityRankingList(db.Model):
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
   home = relationship("HomePage", back_populates='city_ranking_list', uselist=False)
+  city = relationship("City", back_populates="city_ranking_list")
 
   __table_args__ = (
     db.Index("idx_city_id_date_city_rank", "city_id", "date"),
