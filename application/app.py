@@ -98,10 +98,10 @@ def home_page():
     'neighborhood_rent_radio', 'city_name', 'city_trend', 'neighborhood_trend',
     'adjust_score', 'property_score', 'neighborhood_score']
   d = {}
-  home_page = None
-  place_name = incoming['place_name']
+  home_page = place_name = None
   try:
-    if incoming.get('home_id', None):
+    if not incoming.get('home_id', None):
+      place_name = incoming['place_name']
       if app.config['IS_PARSE_ADDRESS']:
         place_name = QueryHelper.parse_address_by_map_box(place_name=place_name)
       home_page = QueryHelper.get_home_page_with_place_name(place_name=place_name)
