@@ -314,7 +314,7 @@ def get_city_ranking_list():
         'increase_radio': item.home.increase_radio,
         'map_box_place_name': item.home.map_box_place_name,
         'house_price_dollar': item.home.house_price_dollar,
-        'pic_url': item.pic_url,
+        'pic_url': QueryHelper.pares_qiniu_pic(item.pic_url),
         'city_name': item.city.city_name
         })
     d['city_ranking_list'] = l
@@ -344,7 +344,7 @@ def get_total_ranking_list():
         'increase_radio': item.home.increase_radio,
         'map_box_place_name': item.home.map_box_place_name,
         'house_price_dollar': item.home.house_price_dollar,
-        'pic_url': item.pic_url
+        'pic_url': QueryHelper.pares_qiniu_pic(item.pic_url)
         })
     d['total_ranking_list'] = l
   except Exception as e:
@@ -372,7 +372,7 @@ def get_super_ranking_list():
         'recent_date': item.recent_date,
         'history_price': item.history_price,
         'rencent_price': item.rencent_price,
-        'pic_url': item.pic_url
+        'pic_url': QueryHelper.pares_qiniu_pic(item.pic_url)
         })
     d['super_ranking_list'] = l
   except Exception as e:
@@ -395,7 +395,7 @@ def get_carouse_figure():
     for item in ranks:
       l.append({
         'index': item.index,
-        'pic_url': item.pic_url
+        'pic_url': QueryHelper.pares_qiniu_pic(item.pic_url)
         })
     d['carouse_figure'] = l
   except Exception as e:

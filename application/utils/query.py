@@ -10,6 +10,7 @@ import json
 from sqlalchemy.exc import DataError, IntegrityError
 import datetime
 import sys
+from qiniu import Auth
 
 FIVE_MINUTES = 60*5
 
@@ -266,3 +267,8 @@ class QueryHelper(object):
   @classmethod
   def get_carouse_figure(cls):
     return CarouselFigure.query.filter_by(is_active=True).all()
+
+  @classmethod
+  def pares_qiniu_pic(cls, key):
+    q = Auth(app.config['QINIU_AK'], app.config['QINIU_SK'])
+    return q.private_download_url(app.config['QINIU_DOMAIN']+key, app.config['QINIU_EXPIRES'])
