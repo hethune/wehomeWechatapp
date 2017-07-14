@@ -295,7 +295,7 @@ def del_collection():
 @requires_token
 def get_city_ranking_list():
   incoming = request.get_json()
-  columns = ['score', 'rental_radio', 'increase_radio', 'map_box_place_name']
+  columns = ['score', 'rental_radio', 'increase_radio', 'map_box_place_name', 'house_price_dollar']
   d = {}
   l = []
   try:
@@ -305,7 +305,8 @@ def get_city_ranking_list():
         'score': item.score,
         'rental_radio': item.home.rental_radio,
         'increase_radio': item.home.increase_radio,
-        'map_box_place_name': item.home.map_box_place_name
+        'map_box_place_name': item.home.map_box_place_name,
+        'house_price_dollar': item.home.house_price_dollar
         })
     d['city_ranking_list'] = l
   except Exception as e:
@@ -320,7 +321,7 @@ def get_city_ranking_list():
 @requires_token
 def get_total_ranking_list():
   incoming = request.get_json()
-  columns = ['score', 'rental_radio', 'increase_radio', 'map_box_place_name']
+  columns = ['score', 'rental_radio', 'increase_radio', 'map_box_place_name', 'house_price_dollar']
   d = {}
   l = []
   try:
@@ -330,11 +331,38 @@ def get_total_ranking_list():
         'score': item.score,
         'rental_radio': item.home.rental_radio,
         'increase_radio': item.home.increase_radio,
-        'map_box_place_name': item.home.map_box_place_name
+        'map_box_place_name': item.home.map_box_place_name,
+        'house_price_dollar': item.home.house_price_dollar
         })
     d['total_ranking_list'] = l
   except Exception as e:
     logger.error("Failed to get total ranking list {}".format(e))
     return jsonify(success=False,
       message='Failed to get total ranking list')
+  return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
+
+@app.route('/api/get_super_ranking_list', methods=['POST'])
+@uuid_gen
+@json_validate(filter=['token'])
+@requires_token
+def get_super_ranking_list():
+  incoming = request.get_json()
+  columns = ['history_date', 'recent_date', 'history_price', 'rencent_price', 'pic_url']
+  d = {}
+  l = []
+  try:
+    ranks = QueryHelper.get_super_ranking_list_with_city()
+    for item in ranks:
+      l.append({
+        'history_date': item.history_date,
+        'recent_date': item.recent_date,
+        'history_price': item.history_price,
+        'rencent_price': item.rencent_price,
+        'pic_url': items.pic_url
+        })
+    d['super_ranking_list'] = l
+  except Exception as e:
+    logger.error("Failed to get super ranking list {}".format(e))
+    return jsonify(success=False,
+      message='Failed to get super ranking list')
   return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
