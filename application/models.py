@@ -35,7 +35,7 @@ class IndexPage(db.Model):
 
 class CityPage(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
-  city_id = db.Column(db.Integer(), db.ForeignKey("city.id", ondelete="CASCADE"), index=True, nullable=False, unique=True)
+  city_id = db.Column(db.Integer(), db.ForeignKey("city.id"), index=True, nullable=False, unique=True)
   sale_online_offline = db.Column(db.Text())
   rent_online_offline = db.Column(db.Text())
   house_sale_number = db.Column(db.Integer())
@@ -67,8 +67,8 @@ class CityPage(db.Model):
 
 class HomePage(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
-  neighbor_id = db.Column(db.Integer(), db.ForeignKey("neighborhood.id", ondelete="CASCADE"), index=True, nullable=False)
-  city_id = db.Column(db.Integer(), db.ForeignKey("city.id", ondelete="CASCADE"), index=True)
+  neighbor_id = db.Column(db.Integer(), db.ForeignKey("neighborhood.id"), index=True, nullable=False)
+  city_id = db.Column(db.Integer(), db.ForeignKey("city.id"), index=True)
   source_id = db.Column(db.String(255), index=True)
   source = db.Column(db.String(255), index=True)
   map_box_place_name = db.Column(db.Text())
@@ -122,7 +122,7 @@ class UnmatchedPlace(db.Model):
 
 class FeedBack(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
-  user_id = db.Column(db.Integer(), db.ForeignKey("user.id", ondelete="CASCADE"), index=True)
+  user_id = db.Column(db.Integer(), db.ForeignKey("user.id"), index=True)
   content = db.Column(db.Text(), index=True, nullable=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
@@ -182,8 +182,8 @@ class Phone(db.Model):
 
 class Collection(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
-  user_id = db.Column(db.Integer(), db.ForeignKey("user.id", ondelete="CASCADE"), index=True, nullable=False)
-  home_id = db.Column(db.Integer(), db.ForeignKey("home_page.id", ondelete="CASCADE"), index=True, nullable=False)
+  user_id = db.Column(db.Integer(), db.ForeignKey("user.id"), index=True, nullable=False)
+  home_id = db.Column(db.Integer(), db.ForeignKey("home_page.id"), index=True, nullable=False)
   is_active = db.Column(db.Boolean(), default=False)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
@@ -200,7 +200,7 @@ class Collection(db.Model):
 
 class CityCount(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
-  city_id = db.Column(db.Integer(), db.ForeignKey("city.id", ondelete="CASCADE"), index=True, nullable=False)
+  city_id = db.Column(db.Integer(), db.ForeignKey("city.id"), index=True, nullable=False)
   today_sale_online = db.Column(db.Integer())
   today_sale_offline = db.Column(db.Integer())
   today_rent_online = db.Column(db.Integer())
@@ -215,8 +215,8 @@ class CityCount(db.Model):
 
 class CityRankingList(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
-  city_id = db.Column(db.Integer(), db.ForeignKey("city.id", ondelete="CASCADE"), index=True, nullable=False)
-  home_id = db.Column(db.Integer(), db.ForeignKey("home_page.id", ondelete="CASCADE"), index=True, nullable=False)
+  city_id = db.Column(db.Integer(), db.ForeignKey("city.id"), index=True, nullable=False)
+  home_id = db.Column(db.Integer(), db.ForeignKey("home_page.id"), index=True, nullable=False)
   date = db.Column(db.Date(), nullable=False, index=True)
   score = db.Column(db.Float(), index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
@@ -224,12 +224,12 @@ class CityRankingList(db.Model):
   home = relationship("HomePage", back_populates='city_ranking_list', uselist=False)
 
   __table_args__ = (
-    db.Index("idx_city_id_date", "city_id", "date"),
+    db.Index("idx_city_id_date_city_rank", "city_id", "date"),
   )
 
 class TotalRankingList(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
-  home_id = db.Column(db.Integer(), db.ForeignKey("home_page.id", ondelete="CASCADE"), index=True, nullable=False)
+  home_id = db.Column(db.Integer(), db.ForeignKey("home_page.id"), index=True, nullable=False)
   date = db.Column(db.Date(), nullable=False, index=True)
   score = db.Column(db.Float(), index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
