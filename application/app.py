@@ -366,6 +366,7 @@ def get_super_ranking_list():
   try:
     ranks = QueryHelper.get_super_ranking_list_with_city()
     for item in ranks:
+      print QueryHelper.pares_qiniu_pic(item.pic_url), '*'*30
       l.append({
         'home_id': item.home.id,
         'history_date': item.history_date,
