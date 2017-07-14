@@ -12,6 +12,7 @@ from index import session
 
 logger = app.logger
 HALF_MINUTE = 30
+TODAY_DATE = datetime.date.today().strftime('%Y-%m-%d')
 
 
 @app.route('/api/index_page', methods=['POST'])
@@ -77,7 +78,7 @@ def city_page():
     # get the city count data
     with db.session.no_autoflush:
       d['city_count'] =  QueryHelper.get_city_count_with_date_and_city(city_id=incoming['city_id'],
-        date=datetime.date.today().strftime('%Y-%m-%d'))
+        date=TODAY_DATE)
   except Exception as e:
     logger.error("Failed to get city page list {}".format(e))
     return jsonify(success=False,
@@ -287,3 +288,53 @@ def del_collection():
       message='Failed to del collection'), 409
   return jsonify(success=True,
       message='Success to del cllection')
+
+@app.route('/api/get_city_ranking_list', methods=['POST'])
+@uuid_gen
+@json_validate(filter=['token', 'city_id'])
+@requires_token
+def get_city_ranking_list():
+  incoming = request.get_json()
+  columns = ['score', 'rental_radio', 'increase_radio', 'map_box_place_name']
+  d = {}
+  l = []
+  try:
+    ranks = QueryHelper.get_city_ranking_list_with_city(city_id=incoming['city_id'], date=TODAY_DATE)
+    for item in ranks:
+      l.append({
+        'score': item.score,
+        'rental_radio': item.home.rental_radio,
+        'increase_radio': item.home.increase_radio,
+        'map_box_place_name': item.home.map_box_place_name
+        })
+    d['city_ranking_list'] = l
+  except Exception as e:
+    logger.error("Failed to get city ranking list {}".format(e))
+    return jsonify(success=False,
+      message='Failed to get city ranking list')
+  return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
+
+@app.route('/api/get_total_ranking_list', methods=['POST'])
+@uuid_gen
+@json_validate(filter=['token'])
+@requires_token
+def get_total_ranking_list():
+  incoming = request.get_json()
+  columns = ['score', 'rental_radio', 'increase_radio', 'map_box_place_name']
+  d = {}
+  l = []
+  try:
+    ranks = QueryHelper.get_total_ranking_list_with_city(date=TODAY_DATE)
+    for item in ranks:
+      l.append({
+        'score': item.score,
+        'rental_radio': item.home.rental_radio,
+        'increase_radio': item.home.increase_radio,
+        'map_box_place_name': item.home.map_box_place_name
+        })
+    d['total_ranking_list'] = l
+  except Exception as e:
+    logger.error("Failed to get total ranking list {}".format(e))
+    return jsonify(success=False,
+      message='Failed to get total ranking list')
+  return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)

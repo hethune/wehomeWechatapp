@@ -95,6 +95,8 @@ class HomePage(db.Model):
   neighborhood = relationship("Neighborhood", back_populates="homepages")
   city = relationship("City", back_populates="homepages")
   collections = relationship("Collection", back_populates="homepage")
+  city_ranking_list = relationship("CityRankingList", back_populates="home")
+  total_ranking_list = relationship("TotalRankingList", back_populates="home")
 
   __table_args__ = (
     db.Index("idx_longitude_latitude", "longitude", "latitude"),
@@ -216,13 +218,20 @@ class CityRankingList(db.Model):
   city_id = db.Column(db.Integer(), db.ForeignKey("city.id", ondelete="CASCADE"), index=True, nullable=False)
   home_id = db.Column(db.Integer(), db.ForeignKey("home_page.id", ondelete="CASCADE"), index=True, nullable=False)
   date = db.Column(db.Date(), nullable=False, index=True)
+  score = db.Column(db.Float(), index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
+  home = relationship("HomePage", back_populates='city_ranking_list', uselist=False)
+
+  __table_args__ = (
+    db.Index("idx_city_id_date", "city_id", "date"),
+  )
 
 class TotalRankingList(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
-  city_id = db.Column(db.Integer(), db.ForeignKey("city.id", ondelete="CASCADE"), index=True, nullable=False)
   home_id = db.Column(db.Integer(), db.ForeignKey("home_page.id", ondelete="CASCADE"), index=True, nullable=False)
   date = db.Column(db.Date(), nullable=False, index=True)
+  score = db.Column(db.Float(), index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
+  home = relationship("HomePage", back_populates='total_ranking_list', uselist=False)
