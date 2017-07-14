@@ -360,20 +360,20 @@ def get_total_ranking_list():
 def get_super_ranking_list():
   incoming = request.get_json()
   columns = ['history_date', 'recent_date', 'history_price', 'rencent_price', 'pic_url',
-    'home_id']
+    'home_id', 'map_box_place_name']
   d = {}
   l = []
   try:
     ranks = QueryHelper.get_super_ranking_list_with_city()
     for item in ranks:
-      print QueryHelper.pares_qiniu_pic(item.pic_url), '*'*30
       l.append({
+        'map_box_place_name': item.home.map_box_place_name,
         'home_id': item.home.id,
         'history_date': item.history_date,
         'recent_date': item.recent_date,
         'history_price': item.history_price,
         'rencent_price': item.rencent_price,
-        'pic_url': QueryHelper.pares_qiniu_pic(item.pic_url)
+        'pic_url': QueryHelper.pares_qiniu_pic(item.pic_url),
         })
     d['super_ranking_list'] = l
   except Exception as e:
