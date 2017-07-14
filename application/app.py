@@ -358,7 +358,7 @@ def get_super_ranking_list():
         'recent_date': item.recent_date,
         'history_price': item.history_price,
         'rencent_price': item.rencent_price,
-        'pic_url': items.pic_url
+        'pic_url': item.pic_url
         })
     d['super_ranking_list'] = l
   except Exception as e:
