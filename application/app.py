@@ -62,7 +62,8 @@ def city_page():
     'rental_income_radio', 'list_average_price', 'deal_average_price', 'city_name', 'one_bed_one_bath_lower_bound',
     'one_bed_one_bath_upper_bound', 'two_bed_two_bath_lower_bound', 'two_bed_two_bath_upper_bound', 'three_bed_two_bath_lower_bound',
     'three_bed_two_bath_upper_bound', 'block_villa_median', 'block_apartment_median', 'today_sale_online', 'today_sale_offline',
-    'today_rent_online', 'today_rent_offline', 'city_count', 'today_sale_online', 'today_sale_offline', 'today_rent_online', 'today_rent_offline']
+    'today_rent_online', 'today_rent_offline', 'city_count', 'today_sale_online', 'today_sale_offline', 'today_rent_online', 'today_rent_offline',
+    'diamond_room_num', 'gold_room_num', 'sliver_room_num', 'bronze_room_num']
   d = {}
   try:
     incoming = request.get_json()
