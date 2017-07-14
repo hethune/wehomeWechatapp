@@ -1,5 +1,5 @@
 from ..models import City, IndexPage, CityPage, HomePage, UnmatchedPlace, FeedBack, User, Phone, Collection, CityCount, CityRankingList, TotalRankingList
-from ..models import SuperRankingList
+from ..models import SuperRankingList, CarouselFigure
 from index import app, db
 from flask import jsonify
 from sqlalchemy import and_
@@ -262,3 +262,7 @@ class QueryHelper(object):
   @classmethod
   def get_super_ranking_list_with_city(cls):
     return SuperRankingList.query.filter_by(is_active=True).limit(10).all()
+
+  @classmethod
+  def get_carouse_figure(cls):
+    return CarouselFigure.query.filter_by(is_active=True).all()

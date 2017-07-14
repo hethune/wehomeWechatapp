@@ -296,7 +296,7 @@ def del_collection():
 @requires_token
 def get_city_ranking_list():
   incoming = request.get_json()
-  columns = ['score', 'rental_radio', 'increase_radio', 'map_box_place_name', 'house_price_dollar']
+  columns = ['score', 'rental_radio', 'increase_radio', 'map_box_place_name', 'house_price_dollar', 'pic_url']
   d = {}
   l = []
   try:
@@ -307,7 +307,8 @@ def get_city_ranking_list():
         'rental_radio': item.home.rental_radio,
         'increase_radio': item.home.increase_radio,
         'map_box_place_name': item.home.map_box_place_name,
-        'house_price_dollar': item.home.house_price_dollar
+        'house_price_dollar': item.home.house_price_dollar,
+        'pic_url': item.pic_url
         })
     d['city_ranking_list'] = l
   except Exception as e:
@@ -322,7 +323,7 @@ def get_city_ranking_list():
 @requires_token
 def get_total_ranking_list():
   incoming = request.get_json()
-  columns = ['score', 'rental_radio', 'increase_radio', 'map_box_place_name', 'house_price_dollar']
+  columns = ['score', 'rental_radio', 'increase_radio', 'map_box_place_name', 'house_price_dollar', 'pic_url']
   d = {}
   l = []
   try:
@@ -333,7 +334,8 @@ def get_total_ranking_list():
         'rental_radio': item.home.rental_radio,
         'increase_radio': item.home.increase_radio,
         'map_box_place_name': item.home.map_box_place_name,
-        'house_price_dollar': item.home.house_price_dollar
+        'house_price_dollar': item.home.house_price_dollar,
+        'pic_url': item.pic_url
         })
     d['total_ranking_list'] = l
   except Exception as e:
@@ -366,4 +368,27 @@ def get_super_ranking_list():
     logger.error("Failed to get super ranking list {}".format(e))
     return jsonify(success=False,
       message='Failed to get super ranking list')
+  return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
+
+@app.route('/api/get_carouse_figure', methods=['POST'])
+@uuid_gen
+@json_validate(filter=['token'])
+@requires_token
+def get_carouse_figure():
+  incoming = request.get_json()
+  columns = ['index', 'pic_url']
+  d = {}
+  l = []
+  try:
+    ranks = QueryHelper.get_carouse_figure()
+    for item in ranks:
+      l.append({
+        'index': item.index,
+        'pic_url': item.pic_url
+        })
+    d['carouse_figure'] = l
+  except Exception as e:
+    logger.error("Failed to get carouse figure list {}".format(e))
+    return jsonify(success=False,
+      message='Failed to get carouse figure list')
   return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
