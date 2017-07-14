@@ -201,6 +201,10 @@ class Collection(db.Model):
 class CityCount(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
   city_id = db.Column(db.Integer(), db.ForeignKey("city.id"), index=True, nullable=False)
+  diamond_room_num = db.Column(db.Integer())
+  gold_room_num = db.Column(db.Integer())
+  sliver_room_num = db.Column(db.Integer())
+  bronze_room_num = db.Column(db.Integer())
   today_sale_online = db.Column(db.Integer())
   today_sale_offline = db.Column(db.Integer())
   today_rent_online = db.Column(db.Integer())
