@@ -270,5 +270,7 @@ class QueryHelper(object):
 
   @classmethod
   def pares_qiniu_pic(cls, key):
+    if not key:
+      return None
     q = Auth(app.config['QINIU_AK'], app.config['QINIU_SK'])
     return q.private_download_url(app.config['QINIU_DOMAIN']+key, app.config['QINIU_EXPIRES'])
