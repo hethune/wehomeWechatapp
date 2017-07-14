@@ -99,6 +99,7 @@ class HomePage(db.Model):
   collections = relationship("Collection", back_populates="homepage")
   city_ranking_list = relationship("CityRankingList", back_populates="home")
   total_ranking_list = relationship("TotalRankingList", back_populates="home")
+  super_ranking_list = relationship("SuperRankingList", back_populates="home")
 
   __table_args__ = (
     db.Index("idx_longitude_latitude", "longitude", "latitude"),
@@ -247,6 +248,7 @@ class TotalRankingList(db.Model):
 
 class SuperRankingList(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
+  home_id = db.Column(db.Integer(), db.ForeignKey("home_page.id"), index=True, nullable=False)
   history_date = db.Column(db.Date(), nullable=False, index=True)
   recent_date = db.Column(db.Date(), nullable=False, index=True)
   history_price = db.Column(db.Integer, nullable=False)
@@ -255,6 +257,7 @@ class SuperRankingList(db.Model):
   is_active = db.Column(db.Boolean(), default=False, index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
+  home = relationship("HomePage", back_populates='super_ranking_list', uselist=False)
 
 class CarouselFigure(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)

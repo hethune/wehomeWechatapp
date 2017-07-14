@@ -88,7 +88,7 @@ def city_page():
 
 @app.route('/api/home_page', methods=['POST'])
 @uuid_gen
-@json_validate(filter=['place_name', 'token', 'third_session'])
+@json_validate(filter=['token', 'third_session'])
 @requires_token
 @requires_auth
 def home_page():
@@ -98,15 +98,19 @@ def home_page():
     'neighborhood_rent_radio', 'city_name', 'city_trend', 'neighborhood_trend',
     'adjust_score', 'property_score', 'neighborhood_score']
   d = {}
+  home_page = None
   place_name = incoming['place_name']
   try:
-    if app.config['IS_PARSE_ADDRESS']:
-      place_name = QueryHelper.parse_address_by_map_box(place_name=place_name)
+    if incoming.get('home_id', None):
+      if app.config['IS_PARSE_ADDRESS']:
+        place_name = QueryHelper.parse_address_by_map_box(place_name=place_name)
+      home_page = QueryHelper.get_home_page_with_place_name(place_name=place_name)
+    else:
+      home_page = QueryHelper.get_home_page_with_home_id(home_id=incoming['home_id'])
 
-    
-    home_page = QueryHelper.get_home_page_with_place_name(place_name=place_name)
     if not home_page:
-      QueryHelper.add_unmatched_place(place_name=incoming['place_name'], type='map_box_place_name')
+      QueryHelper.add_unmatched_place(
+        place_name=incoming['place_name'] if incoming.get('place_name', None) else incoming.get('home_id'), type='map_box_place_name')
       logger.error("Failed to get home page list we cant't find the given place")
       return jsonify(success=False,
         message="Failed to get home page list we cant't find the given place"), 409
@@ -297,13 +301,14 @@ def del_collection():
 def get_city_ranking_list():
   incoming = request.get_json()
   columns = ['score', 'rental_radio', 'increase_radio', 'map_box_place_name', 'house_price_dollar',
-    'pic_url', 'city_name']
+    'pic_url', 'city_name', 'home_id']
   d = {}
   l = []
   try:
     ranks = QueryHelper.get_city_ranking_list_with_city(city_id=incoming['city_id'], date=TODAY_DATE)
     for item in ranks:
       l.append({
+        'home_id': item.home.id,
         'score': item.score,
         'rental_radio': item.home.rental_radio,
         'increase_radio': item.home.increase_radio,
@@ -325,13 +330,15 @@ def get_city_ranking_list():
 @requires_token
 def get_total_ranking_list():
   incoming = request.get_json()
-  columns = ['score', 'rental_radio', 'increase_radio', 'map_box_place_name', 'house_price_dollar', 'pic_url']
+  columns = ['score', 'rental_radio', 'increase_radio', 'map_box_place_name', 'house_price_dollar', 'pic_url',
+    'home_id']
   d = {}
   l = []
   try:
     ranks = QueryHelper.get_total_ranking_list_with_city(date=TODAY_DATE)
     for item in ranks:
       l.append({
+        'home_id': item.home.id,
         'score': item.score,
         'rental_radio': item.home.rental_radio,
         'increase_radio': item.home.increase_radio,
@@ -352,13 +359,15 @@ def get_total_ranking_list():
 @requires_token
 def get_super_ranking_list():
   incoming = request.get_json()
-  columns = ['history_date', 'recent_date', 'history_price', 'rencent_price', 'pic_url']
+  columns = ['history_date', 'recent_date', 'history_price', 'rencent_price', 'pic_url',
+    'home_id']
   d = {}
   l = []
   try:
     ranks = QueryHelper.get_super_ranking_list_with_city()
     for item in ranks:
       l.append({
+        'home_id': item.home.id,
         'history_date': item.history_date,
         'recent_date': item.recent_date,
         'history_price': item.history_price,
