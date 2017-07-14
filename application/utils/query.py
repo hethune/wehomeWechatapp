@@ -1,4 +1,5 @@
 from ..models import City, IndexPage, CityPage, HomePage, UnmatchedPlace, FeedBack, User, Phone, Collection, CityCount, CityRankingList, TotalRankingList
+from ..models import SuperRankingList
 from index import app, db
 from flask import jsonify
 from sqlalchemy import and_
@@ -257,3 +258,7 @@ class QueryHelper(object):
   def get_total_ranking_list_with_city(cls, date):
     return TotalRankingList.query.filter_by(date=date).order_by(
         TotalRankingList.score.desc()).limit(10).all()
+
+  @classmethod
+  def get_super_ranking_list_with_city(cls):
+    return SuperRankingList.query.filter_by(is_active=True).limit(10).all()

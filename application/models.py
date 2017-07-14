@@ -184,7 +184,7 @@ class Collection(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
   user_id = db.Column(db.Integer(), db.ForeignKey("user.id"), index=True, nullable=False)
   home_id = db.Column(db.Integer(), db.ForeignKey("home_page.id"), index=True, nullable=False)
-  is_active = db.Column(db.Boolean(), default=False)
+  is_active = db.Column(db.Boolean(), default=False, index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
   homepage = relationship("HomePage", back_populates="collections")
@@ -235,3 +235,14 @@ class TotalRankingList(db.Model):
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
   home = relationship("HomePage", back_populates='total_ranking_list', uselist=False)
+
+class SuperRankingList(db.Model):
+  id = db.Column(db.Integer(), index=True, primary_key=True)
+  history_date = db.Column(db.Date(), nullable=False, index=True)
+  recent_date = db.Column(db.Date(), nullable=False, index=True)
+  history_price = db.Column(db.Integer, nullable=False)
+  rencent_price = db.Column(db.Integer, nullable=False)
+  pic_url = db.Column(db.String(1024))
+  is_active = db.Column(db.Boolean(), default=False, index=True)
+  created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
+  updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
