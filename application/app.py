@@ -383,7 +383,7 @@ def get_city_ranking_list():
 def get_total_ranking_list():
   incoming = request.get_json()
   columns = ['score', 'rental_radio', 'increase_radio', 'map_box_place_name', 'house_price_dollar', 'pic_url',
-    'home_id']
+    'home_id', 'rental_income_radio']
   d = {}
   l = []
   try:
@@ -396,6 +396,7 @@ def get_total_ranking_list():
         'increase_radio': item.home.increase_radio,
         'map_box_place_name': item.home.map_box_place_name,
         'house_price_dollar': item.home.house_price_dollar,
+        'rental_income_radio': item.home.rental_income_radio,
         'pic_url': QueryHelper.pares_qiniu_pic(item.pic_url)
         })
     d['total_ranking_list'] = l
