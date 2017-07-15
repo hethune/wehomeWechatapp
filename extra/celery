@@ -11,7 +11,7 @@ CELERYD_NODES="worker"
 #CELERYD_NODES=10
 
 # Absolute or relative path to the 'celery' command:
-CELERY_BIN="/home/ubuntu/wehomePlatform/venv/bin/celery"
+CELERY_BIN="/srv/wehomeWechatapp/venv/bin/celery"
 #CELERY_BIN="/srv/wehomeWechatapp/venv/bin/celery"
 
 # App instance to use
