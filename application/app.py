@@ -191,7 +191,7 @@ def v2_home_page():
     }
     for k, v in validate_d.items():
       if not v:
-        QueryHelper.add_unmatched_place(place_name=incoming['place_name'], type=k)
+        QueryHelper.add_unmatched_place(place_name=incoming.get('place_name', None), type=k)
 
   except Exception as e:
     logger.error("Failed to get home page list {}".format(e))
