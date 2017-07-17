@@ -247,18 +247,17 @@ class QueryHelper(object):
     return Collection.query.filter(and_(Collection.user_id==user_id, Collection.is_active==True)).all()
 
   @classmethod
-  def get_city_count_with_date_and_city(cls, city_id, date):
+  def get_city_count_with_date_and_city(cls, city_id, date=None):
     return CityCount.query.filter_by(city_id=city_id).order_by(CityCount.date.desc()).first()
 
   @classmethod
-  def get_city_ranking_list_with_city(cls, city_id, date):
+  def get_city_ranking_list_with_city(cls, city_id, date=None):
     return CityRankingList.query.filter_by(city_id=city_id).order_by(
         CityRankingList.date.desc()).limit(10).all()
 
   @classmethod
-  def get_total_ranking_list_with_city(cls, date):
-    return TotalRankingList.query.filter_by(date=date).order_by(
-        TotalRankingList.score.desc()).limit(10).all()
+  def get_total_ranking_list_with_city(cls, date=None):
+    return TotalRankingList.query.order_by(TotalRankingList.date.desc()).limit(10).all()
 
   @classmethod
   def get_super_ranking_list_with_city(cls):
