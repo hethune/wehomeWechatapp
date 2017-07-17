@@ -457,3 +457,10 @@ def get_carouse_figure():
     return jsonify(success=False,
       message='Failed to get carouse figure list')
   return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
+
+@app.route('/api/get_answer', methods=['POST'])
+@uuid_gen
+@json_validate(filter=['token'])
+@requires_token
+def get_answer():
+  return jsonify(success=True, answer_url=QueryHelper.get_answer_url().pic_url)
