@@ -1,5 +1,5 @@
 from ..models import City, IndexPage, CityPage, HomePage, UnmatchedPlace, FeedBack, User, Phone, Collection, CityCount, CityRankingList, TotalRankingList
-from ..models import SuperRankingList, CarouselFigure
+from ..models import SuperRankingList, CarouselFigure, Answer
 from index import app, db
 from flask import jsonify
 from sqlalchemy import and_
@@ -274,3 +274,7 @@ class QueryHelper(object):
       return None
     q = Auth(app.config['QINIU_AK'], app.config['QINIU_SK'])
     return q.private_download_url(app.config['QINIU_DOMAIN']+key, app.config['QINIU_EXPIRES'])
+
+  @classmethod
+  def get_answer_url(cls):
+    return Answer.query.filter_by(is_active=True).first()
