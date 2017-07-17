@@ -463,4 +463,4 @@ def get_carouse_figure():
 @json_validate(filter=['token'])
 @requires_token
 def get_answer():
-  return jsonify(success=True, answer_url=QueryHelper.get_answer_url().pic_url)
+  return jsonify(success=True, answer_url=QueryHelper.pares_qiniu_pic(key=QueryHelper.get_answer_url().pic_url))
