@@ -11,6 +11,8 @@ from itsdangerous import SignatureExpired, BadSignature
 from index import session
 
 TWO_HOURS = 60*60*2
+ONE_DAY = TWO_HOURS * 12
+ONE_WEEK = ONE_DAY * 7
 
 def uuid_gen(f):
   @wraps(f)
@@ -61,7 +63,7 @@ def requires_auth(f=None):
     return jsonify(message="Authorization is required to access this resource"), 401
   return decorated
 
-def generate_token(user, session_key, expiration=TWO_HOURS):
+def generate_token(user, session_key, expiration=ONE_WEEK):
   s = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
   token = s.dumps({
     'id': user.id,
