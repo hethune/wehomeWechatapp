@@ -13,6 +13,7 @@ from index import session
 TWO_HOURS = 60*60*2
 ONE_DAY = TWO_HOURS * 12
 ONE_WEEK = ONE_DAY * 7
+logger = app.logger
 
 def uuid_gen(f):
   @wraps(f)
@@ -46,6 +47,8 @@ def requires_token(f=None):
     token = incoming['token']
     if token == app.config['WECHAT_TOKEN']:
       return f(*args, **kwargs)
+
+    logger.error('Token is required to access this resource token is {}'.format(token))
     return jsonify(message="Token is required to access this resource"), 401
   return decorated
 
@@ -60,6 +63,8 @@ def requires_auth(f=None):
     if user and session[str(user['id'])]==third_session:
       g.current_user = user
       return f(*args, **kwargs)
+
+    logger.error('Authorization is required to access this resource third_session is {}'.format(third_session))
     return jsonify(message="Authorization is required to access this resource"), 401
   return decorated
 

@@ -241,8 +241,10 @@ def login():
   session[str(user.id)] = third_session
 
   if not user.phone:
+    logger.error('Phone not verifed {third_session}'.format(third_session=session[str(user.id)]))
     return jsonify(success=False, status=0, user_id=user.id,
       message='Phone not verifed', third_session=session[str(user.id)])
+    
   return jsonify(success=True, user_id=user.id, third_session=session[str(user.id)])
 
 @app.route("/api/send_mobile_code", methods=["POST"])
