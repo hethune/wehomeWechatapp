@@ -228,7 +228,7 @@ def login():
   # get wechat sssion key and openid
   result = QueryHelper.get_wechat_sessionkey_and_openid(incoming['code'])
   if not result.get('session_key', None):
-    logger.error('Failed to get session key')
+    logger.error('Failed to get session key {code} {result}'.format(code=incoming['code'], result=result))
     return jsonify(success=False,
       message='Failed to get session key'), 409
 
