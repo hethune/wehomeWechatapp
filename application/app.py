@@ -75,7 +75,7 @@ def city_page():
     city_page.one_room_one_toilet = json.loads(city_page.one_room_one_toilet) if city_page.one_room_one_toilet else None
     city_page.two_room_two_toilet = json.loads(city_page.two_room_two_toilet) if city_page.two_room_two_toilet else None
     city_page.three_room_two_toilet = json.loads(city_page.three_room_two_toilet) if city_page.three_room_two_toilet else None
-    city_page.pic_url = QueryHelper.pares_qiniu_pic(city_page.pic_url) if city_page.pic_url else None
+    # city_page.pic_url = QueryHelper.pares_qiniu_pic(city_page.pic_url) if city_page.pic_url else None
     d['city_page'] = city_page
     # get the city count data
     with db.session.no_autoflush:
