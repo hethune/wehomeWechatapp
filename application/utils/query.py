@@ -1,5 +1,5 @@
 from ..models import City, IndexPage, CityPage, HomePage, UnmatchedPlace, FeedBack, User, Phone, Collection, CityCount, CityRankingList, TotalRankingList
-from ..models import SuperRankingList, CarouselFigure, Answer
+from ..models import SuperRankingList, CarouselFigure, Answer, UserQueryFrequency
 from index import app, db
 from flask import jsonify
 from sqlalchemy import and_
@@ -277,3 +277,24 @@ class QueryHelper(object):
   @classmethod
   def get_answer_url(cls):
     return Answer.query.filter_by(is_active=True).first()
+
+  @classmethod
+  def validate_query_frequency_grant(cls, user_id, date):
+    user = cls.get_user_with_id(user_id=user_id)
+    if user.phone:
+      return True
+
+    frequency = UserQueryFrequency.query.filter(and_(UserQueryFrequency.user_id==user_id,
+      UserQueryFrequency.date==date)).first()
+
+    if not frequency:
+      frequency = UserQueryFrequency(user_id=user_id, frequency=1, date=date)
+      db.session.add(frequency)
+      db.session.commit()
+      return True
+    if frequency.frequency < app.config['USER_QUERY_COUNT']:
+      frequency.frequency += 1
+      db.session.merge(frequency)
+      db.session.commit()
+      return True
+    return False

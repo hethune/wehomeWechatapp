@@ -145,7 +145,7 @@ def home_page():
 @requires_auth
 def v2_home_page():
   incoming = request.get_json()
-  if not QueryHelper.validate_query_time_grant(user_id=g.current_user['id'], date=TODAY_DATE):
+  if not QueryHelper.validate_query_frequency_grant(user_id=g.current_user['id'], date=TODAY_DATE):
     logger.error("The user's query frequency is out of limit")
     return jsonify(success=False,
       message="The user's query frequency is out of limit"), 409
