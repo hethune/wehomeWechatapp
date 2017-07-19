@@ -228,16 +228,16 @@ def login():
   # get wechat sssion key and openid
   result = QueryHelper.get_wechat_sessionkey_and_openid(incoming['code'])
   if not result.get('session_key', None):
-    logger.error('Failed to login')
+    logger.error('Failed to get session key')
     return jsonify(success=False,
-      message='Failed to login'), 409
+      message='Failed to get session key'), 409
 
   # if not register then regist and return 3rd_session
   user = QueryHelper.add_or_set_user(openid=result['openid'], nick_name=incoming['rawdata']['nickName'],
     gender=incoming['rawdata']['gender'], language=incoming['rawdata']['language'], city=incoming['rawdata']['city'],
     province=incoming['rawdata']['province'], country=incoming['rawdata']['country'], avatar_url=incoming['rawdata']['avatarUrl'])
   if not user:
-    logger.error('Failed to login')
+    logger.error('Failed to get user')
     return jsonify(success=False,
       message='Failed to login'), 409
   # if not fill the phone number then send sms message and validate
