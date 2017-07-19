@@ -63,7 +63,7 @@ def city_page():
     'one_bed_one_bath_upper_bound', 'two_bed_two_bath_lower_bound', 'two_bed_two_bath_upper_bound', 'three_bed_two_bath_lower_bound',
     'three_bed_two_bath_upper_bound', 'block_villa_median', 'block_apartment_median', 'today_sale_online', 'today_sale_offline',
     'today_rent_online', 'today_rent_offline', 'city_count', 'today_sale_online', 'today_sale_offline', 'today_rent_online', 'today_rent_offline',
-    'diamond_room_num', 'gold_room_num', 'sliver_room_num', 'bronze_room_num']
+    'diamond_room_num', 'gold_room_num', 'sliver_room_num', 'bronze_room_num', 'pic_url']
   d = {}
   try:
     incoming = request.get_json()
@@ -75,6 +75,7 @@ def city_page():
     city_page.one_room_one_toilet = json.loads(city_page.one_room_one_toilet) if city_page.one_room_one_toilet else None
     city_page.two_room_two_toilet = json.loads(city_page.two_room_two_toilet) if city_page.two_room_two_toilet else None
     city_page.three_room_two_toilet = json.loads(city_page.three_room_two_toilet) if city_page.three_room_two_toilet else None
+    # city_page.pic_url = QueryHelper.pares_qiniu_pic(city_page.pic_url) if city_page.pic_url else None
     d['city_page'] = city_page
     # get the city count data
     with db.session.no_autoflush:
