@@ -273,3 +273,20 @@ class Answer(db.Model):
   is_active = db.Column(db.Boolean(), default=False, index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
+
+class UserQueryFrequency(db.Model):
+  id = db.Column(db.Integer(), index=True, primary_key=True)
+  user_id = db.Column(db.Integer(), db.ForeignKey("user.id"), index=True)
+  frequency = db.Column(db.Integer(), index=True)
+  date = db.Column(db.Date(), nullable=False, index=True)
+  created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
+  updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
+
+  def __init__(self, user_id, frequency, date):
+    self.user_id = user_id
+    self.frequency = frequency
+    self.date = date
+
+  __table_args__ = (
+    db.Index("idx_user_id_date", "user_id", "date"),
+  )

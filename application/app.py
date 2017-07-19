@@ -145,6 +145,11 @@ def home_page():
 @requires_auth
 def v2_home_page():
   incoming = request.get_json()
+  if not QueryHelper.validate_query_time_grant(user_id=g.current_user['id'], date=TODAY_DATE):
+    logger.error("The user's query frequency is out of limit")
+    return jsonify(success=False,
+      message="The user's query frequency is out of limit"), 409
+
   columns = ['map_box_place_name', 'score', 'house_price_dollar', 'exchange_rate',
     'rent', 'rental_radio', 'increase_radio', 'rental_income_radio',
     'neighborhood_rent_radio', 'city_name', 'city_trend', 'neighborhood_trend',
