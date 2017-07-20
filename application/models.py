@@ -315,16 +315,16 @@ class CityCollection(db.Model):
 class ReadCondition(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
   user_id = db.Column(db.Integer(), db.ForeignKey("user.id", ondelete="CASCADE"), index=True, nullable=False)
-  cklist_id = db.Column(db.Integer(), db.ForeignKey("city_ranking_list.id", ondelete="CASCADE"), index=True, nullable=False)
-  date = db.Column(db.Date(), nullable=False, index=True)
+  city_id = db.Column(db.Integer(), db.ForeignKey("city.id", ondelete="CASCADE"), index=True, nullable=False)
+  rank_date = db.Column(db.Date(), nullable=False, index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
-  def __init__(self, user_id, cklist_id, date):
+  def __init__(self, user_id, city_id, rank_date):
     self.user_id = user_id
-    self.cklist_id = cklist_id
-    self.date = date
+    self.city_id = city_id
+    self.rank_date = rank_date
 
   __table_args__ = (
-    db.Index("idx_readcondition_user_id_cklist_id_date", "user_id", "cklist_id", 'date'),
+    db.Index("idx_readcondition_user_id_city_id_date", "user_id", "city_id", 'rank_date'),
   )

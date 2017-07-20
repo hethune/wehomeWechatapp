@@ -336,16 +336,16 @@ class QueryHelper(object):
     return True
 
   @classmethod
-  def get_read_condition_with_user(cls, user_id, cklist_id, date):
+  def get_read_condition_with_user(cls, user_id, city_id, rank_date):
     return ReadCondition.query.filter(and_(ReadCondition.user_id==user_id,
-      ReadCondition.cklist_id==cklist_id, ReadCondition.date==date)).first()
+      ReadCondition.city_id==city_id, ReadCondition.rank_date==rank_date)).first()
 
   @classmethod
-  def set_read_condition(cls, user_id, cklist_id, date):
-    rc = cls.get_read_condition_with_user(user_id=user_id, cklist_id=cklist_id, date=date)
+  def set_read_condition(cls, user_id, city_id, rank_date):
+    rc = cls.get_read_condition_with_user(user_id=user_id, city_id=city_id, rank_date=rank_date)
     try:
       if not rc:
-        rc = ReadCondition(user_id=user_id, cklist_id=cklist_id, date=date)
+        rc = ReadCondition(user_id=user_id, city_id=city_id, rank_date=rank_date)
         db.session.add(rc)
         db.session.commit()
     except (DataError, IntegrityError), e:
