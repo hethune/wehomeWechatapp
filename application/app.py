@@ -505,3 +505,21 @@ def del_home_collection():
       message='Failed to del city collection'), 409
   return jsonify(success=True,
       message='Success to del city cllection')
+
+@app.route('/api/set_read_condition', methods=['POST'])
+@uuid_gen
+@json_validate(filter=['city_id', 'token', 'third_session'])
+@requires_token
+@requires_auth
+def set_read_condition():
+  incoming = request.get_json()
+  ranks = QueryHelper.get_city_ranking_list_with_city(city_id=incoming['city_id'])
+  is_success = QueryHelper.set_read_condition(user_id=g.current_user['id'],
+    city_id=incoming['city_id'], rank_date=ranks[0].created_at.strftime('%Y-%m-%d'))
+  if not is_success:
+    logger.error('Failed to set read condition user: {user_id} city: {city_id}'.format(
+      user_id=g.current_user['id'], city_id=incoming['city_id']))
+    return jsonify(success=False,
+      message='Failed to set read condition'), 409
+  return jsonify(success=True,
+      message='Success to set read condition')
