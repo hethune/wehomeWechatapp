@@ -35,7 +35,7 @@ class IndexPage(db.Model):
 
 class CityPage(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
-  city_id = db.Column(db.Integer(), db.ForeignKey("city.id"), index=True, nullable=False, unique=True)
+  city_id = db.Column(db.Integer(), db.ForeignKey("city.id", ondelete="CASCADE"), index=True, nullable=False, unique=True)
   sale_online_offline = db.Column(db.Text())
   rent_online_offline = db.Column(db.Text())
   house_sale_number = db.Column(db.Integer())
@@ -68,8 +68,8 @@ class CityPage(db.Model):
 
 class HomePage(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
-  neighbor_id = db.Column(db.Integer(), db.ForeignKey("neighborhood.id"), index=True, nullable=False)
-  city_id = db.Column(db.Integer(), db.ForeignKey("city.id"), index=True)
+  neighbor_id = db.Column(db.Integer(), db.ForeignKey("neighborhood.id", ondelete="CASCADE"), index=True, nullable=False)
+  city_id = db.Column(db.Integer(), db.ForeignKey("city.id", ondelete="CASCADE"), index=True)
   source_id = db.Column(db.String(255), index=True)
   source = db.Column(db.String(255), index=True)
   map_box_place_name = db.Column(db.Text())
@@ -126,7 +126,7 @@ class UnmatchedPlace(db.Model):
 
 class FeedBack(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
-  user_id = db.Column(db.Integer(), db.ForeignKey("user.id"), index=True)
+  user_id = db.Column(db.Integer(), db.ForeignKey("user.id", ondelete="CASCADE"), index=True)
   content = db.Column(db.Text(), index=True, nullable=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
@@ -186,8 +186,8 @@ class Phone(db.Model):
 
 class Collection(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
-  user_id = db.Column(db.Integer(), db.ForeignKey("user.id"), index=True, nullable=False)
-  home_id = db.Column(db.Integer(), db.ForeignKey("home_page.id"), index=True, nullable=False)
+  user_id = db.Column(db.Integer(), db.ForeignKey("user.id", ondelete="CASCADE"), index=True, nullable=False)
+  home_id = db.Column(db.Integer(), db.ForeignKey("home_page.id", ondelete="CASCADE"), index=True, nullable=False)
   is_active = db.Column(db.Boolean(), default=False, index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
@@ -204,7 +204,7 @@ class Collection(db.Model):
 
 class CityCount(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
-  city_id = db.Column(db.Integer(), db.ForeignKey("city.id"), index=True, nullable=False)
+  city_id = db.Column(db.Integer(), db.ForeignKey("city.id", ondelete="CASCADE"), index=True, nullable=False)
   diamond_room_num = db.Column(db.Integer())
   gold_room_num = db.Column(db.Integer())
   sliver_room_num = db.Column(db.Integer())
@@ -223,11 +223,12 @@ class CityCount(db.Model):
 
 class CityRankingList(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
-  city_id = db.Column(db.Integer(), db.ForeignKey("city.id"), index=True, nullable=False)
-  home_id = db.Column(db.Integer(), db.ForeignKey("home_page.id"), index=True, nullable=False)
+  city_id = db.Column(db.Integer(), db.ForeignKey("city.id", ondelete="CASCADE"), index=True, nullable=False)
+  home_id = db.Column(db.Integer(), db.ForeignKey("home_page.id", ondelete="CASCADE"), index=True, nullable=False)
   date = db.Column(db.Date(), nullable=False, index=True)
   score = db.Column(db.Float(), index=True)
   pic_url = db.Column(db.String(1024))
+  is_active = db.Column(db.Boolean(), default=True, index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
   home = relationship("HomePage", back_populates='city_ranking_list', uselist=False)
@@ -235,11 +236,12 @@ class CityRankingList(db.Model):
 
   __table_args__ = (
     db.Index("idx_city_id_date_city_rank", "city_id", "date"),
+    db.Index("idx_city_id_is_active", "city_id", "is_active"),
   )
 
 class TotalRankingList(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
-  home_id = db.Column(db.Integer(), db.ForeignKey("home_page.id"), index=True, nullable=False)
+  home_id = db.Column(db.Integer(), db.ForeignKey("home_page.id", ondelete="CASCADE"), index=True, nullable=False)
   date = db.Column(db.Date(), nullable=False, index=True)
   score = db.Column(db.Float(), index=True)
   pic_url = db.Column(db.String(1024))
@@ -249,7 +251,7 @@ class TotalRankingList(db.Model):
 
 class SuperRankingList(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
-  home_id = db.Column(db.Integer(), db.ForeignKey("home_page.id"), index=True, nullable=False)
+  home_id = db.Column(db.Integer(), db.ForeignKey("home_page.id", ondelete="CASCADE"), index=True, nullable=False)
   history_date = db.Column(db.Date(), nullable=False, index=True)
   recent_date = db.Column(db.Date(), nullable=False, index=True)
   history_price = db.Column(db.Integer, nullable=False)
@@ -277,7 +279,7 @@ class Answer(db.Model):
 
 class UserQueryFrequency(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
-  user_id = db.Column(db.Integer(), db.ForeignKey("user.id"), index=True)
+  user_id = db.Column(db.Integer(), db.ForeignKey("user.id", ondelete="CASCADE"), index=True)
   frequency = db.Column(db.Integer(), index=True)
   date = db.Column(db.Date(), nullable=False, index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
@@ -290,4 +292,39 @@ class UserQueryFrequency(db.Model):
 
   __table_args__ = (
     db.Index("idx_user_id_date", "user_id", "date"),
+  )
+
+class CityCollection(db.Model):
+  id = db.Column(db.Integer(), index=True, primary_key=True)
+  user_id = db.Column(db.Integer(), db.ForeignKey("user.id", ondelete="CASCADE"), index=True, nullable=False)
+  city_id = db.Column(db.Integer(), db.ForeignKey("city.id", ondelete="CASCADE"), index=True, nullable=False)
+  is_active = db.Column(db.Boolean(), default=False, index=True)
+  created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
+  updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
+
+
+  def __init__(self, user_id, city_id, is_active=True):
+    self.user_id = user_id
+    self.city_id = city_id
+    self.is_active = is_active
+
+  __table_args__ = (
+    db.Index("idx_citycollection_user_id_city_id_is_active", "user_id", "city_id", 'is_active'),
+  )
+
+class ReadCondition(db.Model):
+  id = db.Column(db.Integer(), index=True, primary_key=True)
+  user_id = db.Column(db.Integer(), db.ForeignKey("user.id", ondelete="CASCADE"), index=True, nullable=False)
+  cklist_id = db.Column(db.Integer(), db.ForeignKey("city_ranking_list.id", ondelete="CASCADE"), index=True, nullable=False)
+  date = db.Column(db.Date(), nullable=False, index=True)
+  created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
+  updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
+
+  def __init__(self, user_id, cklist_id, date):
+    self.user_id = user_id
+    self.cklist_id = cklist_id
+    self.date = date
+
+  __table_args__ = (
+    db.Index("idx_readcondition_user_id_cklist_id_date", "user_id", "cklist_id", 'date'),
   )

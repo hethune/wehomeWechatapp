@@ -1,5 +1,5 @@
 from ..models import City, IndexPage, CityPage, HomePage, UnmatchedPlace, FeedBack, User, Phone, Collection, CityCount, CityRankingList, TotalRankingList
-from ..models import SuperRankingList, CarouselFigure, Answer, UserQueryFrequency
+from ..models import SuperRankingList, CarouselFigure, Answer, UserQueryFrequency, CityCollection, ReadCondition
 from index import app, db
 from flask import jsonify
 from sqlalchemy import and_
@@ -300,3 +300,55 @@ class QueryHelper(object):
       db.session.commit()
       return True
     return False
+
+  @classmethod
+  def get_home_collection_with_user_city(cls, user_id, city_id):
+    return CityCollection.query.filter(and_(CityCollection.user_id==user_id, CityCollection.city_id==city_id)).first()
+
+  @classmethod
+  def set_home_collection(cls, user_id, city_id):
+    city_collection = cls.get_home_collection_with_user_city(user_id=user_id, city_id=city_id)
+    if not city_collection:
+      city_collection = CityCollection(user_id=user_id, city_id=city_id)
+    else:
+      city_collection.is_active = True
+
+    try:
+      db.session.merge(city_collection)
+      db.session.commit()
+    except (DataError, IntegrityError), e:
+      app.logger.error(sys._getframe().f_code.co_name + str(e))
+      return None
+    return cls.get_home_collection_with_user_city(user_id=user_id, city_id=city_id)
+
+  @classmethod
+  def del_home_collection(cls, user_id, city_id):
+    city_collection = cls.get_home_collection_with_user_city(user_id=user_id, city_id=city_id)
+    if not city_collection:
+      return False
+    city_collection.is_active = False
+    try:
+      db.session.merge(city_collection)
+      db.session.commit()
+    except (DataError, IntegrityError), e:
+      app.logger.error(sys._getframe().f_code.co_name + str(e))
+      return False
+    return True
+
+  @classmethod
+  def get_read_condition_with_user(cls, user_id, cklist_id, date):
+    return ReadCondition.query.filter(and_(ReadCondition.user_id==user_id,
+      ReadCondition.cklist_id==cklist_id, ReadCondition.date==date)).first()
+
+  @classmethod
+  def set_read_condition(cls, user_id, cklist_id, date):
+    rc = cls.get_read_condition_with_user(user_id=user_id, cklist_id=cklist_id, date=date)
+    try:
+      if not rc:
+        rc = ReadCondition(user_id=user_id, cklist_id=cklist_id, date=date)
+        db.session.add(rc)
+        db.session.commit()
+    except (DataError, IntegrityError), e:
+      app.logger.error(sys._getframe().f_code.co_name + str(e))
+      return None
+    return rc
