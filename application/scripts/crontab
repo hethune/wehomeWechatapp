@@ -1,0 +1,1 @@
+*/1 * * * * /home/herry/web/wehomeWechatapp/venv/bin /home/herry/web/wehomeWechatapp/manage.py sync_data

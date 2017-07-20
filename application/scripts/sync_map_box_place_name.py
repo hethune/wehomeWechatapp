@@ -9,12 +9,6 @@ from Queue import Empty
 import time
 import random
 
-# def update_bar(pbar):
-#   print
-#   L.acquire()
-#   pbar.update()
-#   L.release()
-
 def write_place_name_to_db(home_id, replace_name):
   with app.app_context():
     query = '''
@@ -31,8 +25,6 @@ def write_place_name_to_db(home_id, replace_name):
       })
       db.session.commit()
     except Exception as e:
-      print query
-      print e
       db.session.rollback()
 
 def update_step(home_id, step):
@@ -100,47 +92,50 @@ def sync_by_lang_lat(update_pbar, pid, queue):
     update_pbar('progress')
 
 def sync_place_data():
-  # place_q = Queue()
-  # query = '''
-  #   SELECT id, address 
-  #   FROM  
-  #       home_page
-  #   WHERE
-  #      address is not null
-  #   AND
-  #      map_box_place_name is null
-  #   AND
-  #     step is null
-  #   LIMIT 1000
-  # '''
-  # datas = db.session.execute(text(query))
-  # for item in datas:
-  #   place_q.put(item)
 
-  # print'step one back-fill with place name start {count} rows'.format(count=datas.rowcount)
-  # jc = JobSchedule(function=sync_by_address, queue=place_q,
-  #   prcesscount=app.config['PROCESS_COUNT'], thread_count=app.config['THREAD_COUNT'], max_size=datas.rowcount)
-  # jc.start()
+  if app.config['SYNC_DATA_TYPE'] == 0:
+    place_q = Queue()
+    query = '''
+      SELECT id, address 
+      FROM  
+          home_page
+      WHERE
+         address is not null
+      AND
+         map_box_place_name is null
+      AND
+        step is null
+      LIMIT 1000
+    '''
+    datas = db.session.execute(text(query))
+    for item in datas:
+      place_q.put(item)
 
-  lang_lat_q = Queue()
-  query = '''
-    SELECT id, longitude, latitude
-    FROM  
-        home_page
-    WHERE
-       map_box_place_name is null
-    AND
-       longitude is not null
-    AND
-       latitude is not null
-    LIMIT 1500
-  '''
-  
-  datas = db.session.execute(text(query))
-  for item in datas:
-    lang_lat_q.put(item)
+    print'step one back-fill with place name start {count} rows'.format(count=datas.rowcount)
+    jc = JobSchedule(function=sync_by_address, queue=place_q,
+      prcesscount=app.config['PROCESS_COUNT'], thread_count=app.config['THREAD_COUNT'], max_size=datas.rowcount)
+    jc.start()
 
-  print 'step two back-fill with lang and lat start {count} rows'.format(count=datas.rowcount)
-  jc = JobSchedule(function=sync_by_lang_lat, queue=lang_lat_q,
-     prcesscount=app.config['PROCESS_COUNT'], thread_count=app.config['THREAD_COUNT'], max_size=datas.rowcount)
-  jc.start()
+  if app.config['SYNC_DATA_TYPE'] == 1:
+    lang_lat_q = Queue()
+    query = '''
+      SELECT id, longitude, latitude
+      FROM  
+          home_page
+      WHERE
+         map_box_place_name is null
+      AND
+         longitude is not null
+      AND
+         latitude is not null
+      LIMIT 1500
+    '''
+    
+    datas = db.session.execute(text(query))
+    for item in datas:
+      lang_lat_q.put(item)
+
+    print 'step two back-fill with lang and lat start {count} rows'.format(count=datas.rowcount)
+    jc = JobSchedule(function=sync_by_lang_lat, queue=lang_lat_q,
+       prcesscount=app.config['PROCESS_COUNT'], thread_count=app.config['THREAD_COUNT'], max_size=datas.rowcount)
+    jc.start()
