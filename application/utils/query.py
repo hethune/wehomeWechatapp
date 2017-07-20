@@ -281,6 +281,8 @@ class QueryHelper(object):
   @classmethod
   def validate_query_frequency_grant(cls, user_id, date):
     user = cls.get_user_with_id(user_id=user_id)
+    if not user:
+      return False
     if user.phone:
       return True
 
