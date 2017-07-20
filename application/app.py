@@ -473,3 +473,35 @@ def get_carouse_figure():
 @requires_token
 def get_answer():
   return jsonify(success=True, answer_url=QueryHelper.pares_qiniu_pic(key=QueryHelper.get_answer_url().pic_url))
+
+@app.route('/api/set_home_collection', methods=['POST'])
+@uuid_gen
+@json_validate(filter=['token', 'city_id', 'third_session'])
+@requires_token
+@requires_auth
+def set_home_collection():
+  incoming = request.get_json()
+  is_success = QueryHelper.set_home_collection(user_id=g.current_user['id'], city_id=incoming['city_id'])
+  if not is_success:
+    logger.error('Failed to set city collection user: {user_id} city: {city_id}'.format(
+      user_id=g.current_user['id'], city_id=incoming['city_id']))
+    return jsonify(success=False,
+      message='Failed to set city collection'), 409
+  return jsonify(success=True,
+      message='Success to set city cllection')
+
+@app.route('/api/del_home_collection', methods=['POST'])
+@uuid_gen
+@json_validate(filter=['city_id', 'token', 'third_session'])
+@requires_token
+@requires_auth
+def del_home_collection():
+  incoming = request.get_json()
+  is_success = QueryHelper.del_home_collection(user_id=g.current_user['id'], city_id=incoming['city_id'])
+  if not is_success:
+    logger.error('Failed to del city collection user: {user_id} city: {city_id}'.format(
+      user_id=g.current_user['id'], city_id=incoming['city_id']))
+    return jsonify(success=False,
+      message='Failed to del city collection'), 409
+  return jsonify(success=True,
+      message='Success to del city cllection')
