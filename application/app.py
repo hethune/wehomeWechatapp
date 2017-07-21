@@ -523,3 +523,27 @@ def set_read_condition():
       message='Failed to set read condition'), 409
   return jsonify(success=True,
       message='Success to set read condition')
+
+@app.route('/api/get_city_collections', methods=['POST'])
+@uuid_gen
+@json_validate(filter=['token', 'third_session'])
+@requires_token
+@requires_auth
+def get_city_collections():
+  incoming = request.get_json()
+  columns = ['city_id', 'city_name']
+  d = {}
+  l = []
+  try:
+    collecions = QueryHelper.get_city_collections(user_id=g.current_user['id'])
+    for collection in collecions:
+      l.append({
+        'city_id': collection.city.id,
+        'city_name': collection.city.city_name
+        })
+    d['city_collections'] = l
+  except Exception as e:
+    logger.error("Failed to get city collection list {}".format(e))
+    return jsonify(success=False,
+      message='Failed to get city collection list')
+  return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
