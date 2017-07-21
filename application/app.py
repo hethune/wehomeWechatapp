@@ -359,7 +359,7 @@ def set_collection():
 @requires_auth
 def get_collections():
   incoming = request.get_json()
-  columns = ['map_box_place_name', 'score']
+  columns = ['map_box_place_name', 'score', 'id']
   d = {}
   l = []
   try:
@@ -367,7 +367,8 @@ def get_collections():
     for item in collections:
       l.append({
         'map_box_place_name': item.homepage.map_box_place_name,
-        'score': item.homepage.score
+        'score': item.homepage.score,
+        'id': item.homepage.id
         })
     d['collections'] = l
   except Exception as e:
@@ -586,3 +587,27 @@ def get_city_collections():
     return jsonify(success=False,
       message='Failed to get city collection list')
   return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
+
+# @app.route('/api/get_today_home', methods=['POST'])
+# @uuid_gen
+# @json_validate(filter=['token', 'third_session'])
+# @requires_token
+# @requires_auth
+# def get_today_home():
+#   incoming = request.get_json()
+#   columns = []
+#   d = {}
+#   l = []
+#   try:
+#     collecions = QueryHelper.get_city_collections(user_id=g.current_user['id'])
+#     for collection in collecions:
+#       l.append({
+#         'city_id': collection.city.id,
+#         'city_name': collection.city.city_name
+#         })
+#     d['city_collections'] = l
+#   except Exception as e:
+#     logger.error("Failed to get city collection list {}".format(e))
+#     return jsonify(success=False,
+#       message='Failed to get city collection list')
+#   return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
