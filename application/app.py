@@ -490,14 +490,14 @@ def set_city_collection():
   return jsonify(success=True,
       message='Success to set city cllection')
 
-@app.route('/api/del_home_collection', methods=['POST'])
+@app.route('/api/del_city_collection', methods=['POST'])
 @uuid_gen
 @json_validate(filter=['city_id', 'token', 'third_session'])
 @requires_token
 @requires_auth
-def del_home_collection():
+def del_city_collection():
   incoming = request.get_json()
-  is_success = QueryHelper.del_home_collection(user_id=g.current_user['id'], city_id=incoming['city_id'])
+  is_success = QueryHelper.del_city_collection(user_id=g.current_user['id'], city_id=incoming['city_id'])
   if not is_success:
     logger.error('Failed to del city collection user: {user_id} city: {city_id}'.format(
       user_id=g.current_user['id'], city_id=incoming['city_id']))
