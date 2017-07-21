@@ -53,8 +53,9 @@ def get_cities():
 
 @app.route('/api/city_page', methods=['POST'])
 @uuid_gen
-@json_validate(filter=['city_id', 'token'])
+@json_validate(filter=['city_id', 'token', 'third_session'])
 @requires_token
+@requires_auth
 def city_page():
   columns = ['sale_online_offline', 'rent_online_offline', 'house_sale_number', 'house_rent_number',
     'block_villa_max', 'block_villa_min', 'block_apartment_max', 'block_apartment_min', 'one_room_one_toilet',
@@ -63,7 +64,7 @@ def city_page():
     'one_bed_one_bath_upper_bound', 'two_bed_two_bath_lower_bound', 'two_bed_two_bath_upper_bound', 'three_bed_two_bath_lower_bound',
     'three_bed_two_bath_upper_bound', 'block_villa_median', 'block_apartment_median', 'today_sale_online', 'today_sale_offline',
     'today_rent_online', 'today_rent_offline', 'city_count', 'today_sale_online', 'today_sale_offline', 'today_rent_online', 'today_rent_offline',
-    'diamond_room_num', 'gold_room_num', 'sliver_room_num', 'bronze_room_num', 'pic_url']
+    'diamond_room_num', 'gold_room_num', 'sliver_room_num', 'bronze_room_num', 'pic_url', 'is_collectd']
   d = {}
   try:
     incoming = request.get_json()
@@ -79,6 +80,7 @@ def city_page():
     d['city_page'] = city_page
     # get the city count data
     with db.session.no_autoflush:
+      d['is_collectd'] = True if QueryHelper.get_collection_with_user_and_city(user_id=g.current_user['id'], city_id=incoming['city_id']) else False
       d['city_count'] =  QueryHelper.get_city_count_with_date_and_city(city_id=incoming['city_id'],
         date=TODAY_DATE)
   except Exception as e:
