@@ -88,6 +88,44 @@ def city_page():
       message='Failed to get city page list')
   return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
 
+@app.route('/api/v2/city_page', methods=['POST'])
+@uuid_gen
+@json_validate(filter=['city_id', 'token', 'third_session'])
+@requires_token
+@requires_auth
+def v2_city_page():
+  columns = ['sale_online_offline', 'rent_online_offline', 'house_sale_number', 'house_rent_number',
+    'block_villa_max', 'block_villa_min', 'block_apartment_max', 'block_apartment_min', 'one_room_one_toilet',
+    'two_room_two_toilet', 'three_room_two_toilet', 'rental_radio', 'house_price_trend', 'increase_radio',
+    'rental_income_radio', 'list_average_price', 'deal_average_price', 'city_name', 'one_bed_one_bath_lower_bound',
+    'one_bed_one_bath_upper_bound', 'two_bed_two_bath_lower_bound', 'two_bed_two_bath_upper_bound', 'three_bed_two_bath_lower_bound',
+    'three_bed_two_bath_upper_bound', 'block_villa_median', 'block_apartment_median', 'today_sale_online', 'today_sale_offline',
+    'today_rent_online', 'today_rent_offline', 'city_count', 'today_sale_online', 'today_sale_offline', 'today_rent_online', 'today_rent_offline',
+    'diamond_room_num', 'gold_room_num', 'sliver_room_num', 'bronze_room_num', 'pic_url', 'is_collectd']
+  d = {}
+  try:
+    incoming = request.get_json()
+    city_page = QueryHelper.get_city_page_with_city_id(city_id=incoming['city_id'])
+    d['city_name'] = city_page.city.city_name
+    city_page.rent_online_offline = json.loads(city_page.rent_online_offline) if city_page.rent_online_offline else None
+    city_page.sale_online_offline = json.loads(city_page.sale_online_offline) if city_page.sale_online_offline else None
+    city_page.house_price_trend = json.loads(city_page.house_price_trend) if city_page.house_price_trend else None
+    city_page.one_room_one_toilet = json.loads(city_page.one_room_one_toilet) if city_page.one_room_one_toilet else None
+    city_page.two_room_two_toilet = json.loads(city_page.two_room_two_toilet) if city_page.two_room_two_toilet else None
+    city_page.three_room_two_toilet = json.loads(city_page.three_room_two_toilet) if city_page.three_room_two_toilet else None
+    city_page.pic_url = QueryHelper.pares_qiniu_pic(city_page.pic_url) if city_page.pic_url else None
+    d['city_page'] = city_page
+    # get the city count data
+    with db.session.no_autoflush:
+      d['is_collectd'] = True if QueryHelper.get_collection_with_user_and_city(user_id=g.current_user['id'], city_id=incoming['city_id']) else False
+      d['city_count'] =  QueryHelper.get_city_count_with_date_and_city(city_id=incoming['city_id'],
+        date=TODAY_DATE)
+  except Exception as e:
+    logger.error("Failed to get city page list {}".format(e))
+    return jsonify(success=False,
+      message='Failed to get city page list')
+  return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
+
 @app.route('/api/home_page', methods=['POST'])
 @uuid_gen
 @json_validate(filter=['place_name', 'token'])
