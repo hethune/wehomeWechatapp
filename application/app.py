@@ -53,7 +53,7 @@ def get_cities():
 
 @app.route('/api/city_page', methods=['POST'])
 @uuid_gen
-@json_validate(filter=['city_id', 'token', 'third_session'])
+@json_validate(filter=['city_id', 'token'])
 @requires_token
 def city_page():
   columns = ['sale_online_offline', 'rent_online_offline', 'house_sale_number', 'house_rent_number',
