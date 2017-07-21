@@ -79,7 +79,7 @@ def city_page():
     d['city_page'] = city_page
     # get the city count data
     with db.session.no_autoflush:
-      d['is_collectd'] = True if QueryHelper.get_collection_with_user_and_city(user_id=g.current_user['id'], city_id=incoming['city_id']) else False
+      # d['is_collectd'] = True if QueryHelper.get_collection_with_user_and_city(user_id=g.current_user['id'], city_id=incoming['city_id']) else False
       d['city_count'] =  QueryHelper.get_city_count_with_date_and_city(city_id=incoming['city_id'],
         date=TODAY_DATE)
   except Exception as e:
