@@ -250,6 +250,10 @@ class TotalRankingList(db.Model):
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
   home = relationship("HomePage", back_populates='total_ranking_list', uselist=False)
 
+  __table_args__ = (
+    db.UniqueConstraint('home_id', 'date', name='unique_home_id_date'),
+  )
+
 class SuperRankingList(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
   home_id = db.Column(db.Integer(), db.ForeignKey("home_page.id", ondelete="CASCADE"), index=True, nullable=False)
