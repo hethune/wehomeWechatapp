@@ -13,6 +13,7 @@ class City(db.Model):
   homepages = relationship("HomePage", back_populates="city")
   citypage = relationship("CityPage", back_populates="city", uselist=False)
   city_ranking_list = relationship("CityRankingList", back_populates="city")
+  city_collections = relationship("CityCollection", back_populates="city")
 
 class Neighborhood(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
@@ -301,7 +302,7 @@ class CityCollection(db.Model):
   is_active = db.Column(db.Boolean(), default=False, index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
-
+  city = relationship("City", back_populates="city_collections")
 
   def __init__(self, user_id, city_id, is_active=True):
     self.user_id = user_id
@@ -310,6 +311,7 @@ class CityCollection(db.Model):
 
   __table_args__ = (
     db.Index("idx_citycollection_user_id_city_id_is_active", "user_id", "city_id", 'is_active'),
+    db.Index("idx_citycollection_user_id_is_active", "user_id", 'is_active'),
   )
 
 class ReadCondition(db.Model):

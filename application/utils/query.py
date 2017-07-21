@@ -353,3 +353,7 @@ class QueryHelper(object):
       app.logger.error(sys._getframe().f_code.co_name + str(e))
       return None
     return rc
+
+  @classmethod
+  def get_city_collections(cls, user_id):
+    return CityCollection.query.filter(and_(CityCollection.user_id==user_id, CityCollection.is_active==True)).all()
