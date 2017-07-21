@@ -55,7 +55,6 @@ def get_cities():
 @uuid_gen
 @json_validate(filter=['city_id', 'token', 'third_session'])
 @requires_token
-@requires_auth
 def city_page():
   columns = ['sale_online_offline', 'rent_online_offline', 'house_sale_number', 'house_rent_number',
     'block_villa_max', 'block_villa_min', 'block_apartment_max', 'block_apartment_min', 'one_room_one_toilet',
