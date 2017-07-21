@@ -362,3 +362,33 @@ class QueryHelper(object):
   def get_collection_with_user_and_city(cls, user_id, city_id):
     return CityCollection.query.filter(and_(CityCollection.user_id==user_id,
       CityCollection.city_id==city_id, CityCollection.is_active==True)).first()
+
+  @classmethod
+  def get_today_new_home_with_user(cls, user_id):
+    query = '''
+      SELECT
+        h.id
+      FROM
+        "public"."user" u
+      INNER JOIN
+        city_collection c
+      ON
+        u.id = c.user_id
+      AND
+        u.id = {user_id}
+      INNER JOIN
+        city_ranking_list l
+      ON
+        c.city_id = l.city_id
+      AND
+        l.date = (SELECT MAX(date) AS date FROM city_ranking_list LIMIT 1)
+      INNER JOIN
+        home_page h
+      ON
+        h.id = l.home_id
+    '''.format(user_id=user_id)
+    result = db.session.execute(query)
+    home_id = result.first()
+    if home_id:
+      return cls.get_home_page_with_home_id(home_id=home_id[0]), result.rowcount
+    return None, 0

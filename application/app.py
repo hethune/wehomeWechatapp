@@ -588,26 +588,22 @@ def get_city_collections():
       message='Failed to get city collection list')
   return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
 
-# @app.route('/api/get_today_home', methods=['POST'])
-# @uuid_gen
-# @json_validate(filter=['token', 'third_session'])
-# @requires_token
-# @requires_auth
-# def get_today_home():
-#   incoming = request.get_json()
-#   columns = []
-#   d = {}
-#   l = []
-#   try:
-#     collecions = QueryHelper.get_city_collections(user_id=g.current_user['id'])
-#     for collection in collecions:
-#       l.append({
-#         'city_id': collection.city.id,
-#         'city_name': collection.city.city_name
-#         })
-#     d['city_collections'] = l
-#   except Exception as e:
-#     logger.error("Failed to get city collection list {}".format(e))
-#     return jsonify(success=False,
-#       message='Failed to get city collection list')
-#   return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
+@app.route('/api/get_today_new_home', methods=['POST'])
+@uuid_gen
+@json_validate(filter=['token', 'third_session'])
+@requires_token
+@requires_auth
+def get_today_new_home():
+  incoming = request.get_json()
+  columns = ['total', 'home', 'score', 'map_box_place_name', 'rental_radio', 'increase_radio']
+  d = {}
+  l = []
+  try:
+    home_page, total = QueryHelper.get_today_new_home_with_user(user_id=g.current_user['id'])
+    d['total'] = total
+    d['home'] = home_page
+  except Exception as e:
+    logger.error("Failed to get today new home {}".format(e))
+    return jsonify(success=False,
+      message='Failed to get today new home')
+  return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
