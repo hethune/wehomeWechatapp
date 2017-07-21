@@ -306,7 +306,7 @@ class QueryHelper(object):
     return CityCollection.query.filter(and_(CityCollection.user_id==user_id, CityCollection.city_id==city_id)).first()
 
   @classmethod
-  def set_home_collection(cls, user_id, city_id):
+  def set_city_collection(cls, user_id, city_id):
     city_collection = cls.get_home_collection_with_user_city(user_id=user_id, city_id=city_id)
     if not city_collection:
       city_collection = CityCollection(user_id=user_id, city_id=city_id)
@@ -322,7 +322,7 @@ class QueryHelper(object):
     return cls.get_home_collection_with_user_city(user_id=user_id, city_id=city_id)
 
   @classmethod
-  def del_home_collection(cls, user_id, city_id):
+  def del_city_collection(cls, user_id, city_id):
     city_collection = cls.get_home_collection_with_user_city(user_id=user_id, city_id=city_id)
     if not city_collection:
       return False
