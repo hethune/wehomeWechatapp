@@ -306,20 +306,21 @@ class QueryHelper(object):
     return CityCollection.query.filter(and_(CityCollection.user_id==user_id, CityCollection.city_id==city_id)).first()
 
   @classmethod
-  def set_city_collection(cls, user_id, city_id):
-    city_collection = cls.get_home_collection_with_user_city(user_id=user_id, city_id=city_id)
-    if not city_collection:
-      city_collection = CityCollection(user_id=user_id, city_id=city_id)
-    else:
-      city_collection.is_active = True
-
+  def set_city_collections(cls, user_id, city_ids):
     try:
-      db.session.merge(city_collection)
-      db.session.commit()
+      for city_id in city_ids:
+        city_collection = cls.get_home_collection_with_user_city(user_id=user_id, city_id=city_id)
+        if not city_collection:
+          city_collection = CityCollection(user_id=user_id, city_id=city_id)
+        else:
+          city_collection.is_active = True
+        db.session.merge(city_collection)
+        db.session.commit()
     except (DataError, IntegrityError), e:
+      db.session.rollback()
       app.logger.error(sys._getframe().f_code.co_name + str(e))
-      return None
-    return cls.get_home_collection_with_user_city(user_id=user_id, city_id=city_id)
+      return False
+    return True
 
   @classmethod
   def del_city_collection(cls, user_id, city_id):

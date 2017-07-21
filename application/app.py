@@ -474,21 +474,21 @@ def get_carouse_figure():
 def get_answer():
   return jsonify(success=True, answer_url=QueryHelper.pares_qiniu_pic(key=QueryHelper.get_answer_url().pic_url))
 
-@app.route('/api/set_city_collection', methods=['POST'])
+@app.route('/api/set_city_collections', methods=['POST'])
 @uuid_gen
-@json_validate(filter=['token', 'city_id', 'third_session'])
+@json_validate(filter=['token', 'city_ids', 'third_session'])
 @requires_token
 @requires_auth
-def set_city_collection():
+def set_city_collections():
   incoming = request.get_json()
-  is_success = QueryHelper.set_city_collection(user_id=g.current_user['id'], city_id=incoming['city_id'])
+  is_success = QueryHelper.set_city_collections(user_id=g.current_user['id'], city_ids=incoming['city_ids'])
   if not is_success:
-    logger.error('Failed to set city collection user: {user_id} city: {city_id}'.format(
+    logger.error('Failed to set city collections user: {user_id} city: {city_id}'.format(
       user_id=g.current_user['id'], city_id=incoming['city_id']))
     return jsonify(success=False,
-      message='Failed to set city collection'), 409
+      message='Failed to set city collections'), 409
   return jsonify(success=True,
-      message='Success to set city cllection')
+      message='Success to set city cllections')
 
 @app.route('/api/del_city_collection', methods=['POST'])
 @uuid_gen
