@@ -376,6 +376,8 @@ class QueryHelper(object):
         u.id = c.user_id
       AND
         u.id = {user_id}
+      AND
+        c.is_active is true
       INNER JOIN
         city_ranking_list l
       ON
