@@ -586,7 +586,7 @@ def get_city_collections():
     logger.error("Failed to get city collection list {}".format(e))
     return jsonify(success=False,
       message='Failed to get city collection list')
-  return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
+  return QueryHelper.to_jso_with_filter(rows_dict=d, columns=columns)
 
 @app.route('/api/get_today_new_home', methods=['POST'])
 @uuid_gen
@@ -607,4 +607,38 @@ def get_today_new_home():
     logger.error("Failed to get today new home {}".format(e))
     return jsonify(success=False,
       message='Failed to get today new home')
+  return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
+
+@app.route('/api/get_all_or_follow_homes', methods=['POST'])
+@uuid_gen
+@json_validate(filter=['token', 'third_session'])
+@requires_token
+@requires_auth
+def get_all_or_follow_homes():
+  incoming = request.get_json()
+  ranks = None
+  columns = ['house_price_dollar', 'rental_income_radio', 'increase_radio', 'score', 'pic_url', 'city_name']
+  d = {}
+  l = []
+  try:
+    rank_ids = QueryHelper.get_today_new_home_with_user(user_id=g.current_user['id'])
+    if len(rank_ids) == 0:
+      ranks = QueryHelper.get_newest_all_city_ranking_list()
+    else:
+      ranks = QueryHelper.get_newest_follow_city_ranking_list(ids=[item[0] for item in rank_ids])
+    for rank in ranks:
+      if d.get(rank.city.id, None) is None:
+        d[rank.city.id] = []
+      d[rank.city.id].append({
+        'city_name': rank.city.city_name,
+        'house_price_dollar': rank.home.house_price_dollar,
+        'rental_income_radio': rank.home.rental_income_radio,
+        'increase_radio': rank.home.increase_radio,
+        'score': rank.score,
+        'pic_url': QueryHelper.pares_qiniu_pic(rank.pic_url)
+        })
+  except Exception as e:
+    logger.error("Failed to get all new homes list {}".format(e))
+    return jsonify(success=False,
+      message='Failed to get all new homes list')
   return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)

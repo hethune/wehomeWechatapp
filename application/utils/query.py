@@ -367,7 +367,7 @@ class QueryHelper(object):
   def get_today_new_home_with_user(cls, user_id):
     query = '''
       SELECT
-        h.id
+        l.id
       FROM
         "public"."user" u
       INNER JOIN
@@ -382,16 +382,9 @@ class QueryHelper(object):
         c.city_id = l.city_id
       AND
         l.date = (SELECT MAX(date) AS date FROM city_ranking_list LIMIT 1)
-      INNER JOIN
-        home_page h
-      ON
-        h.id = l.home_id
     '''.format(user_id=user_id)
     result = db.session.execute(query)
-    home_id = result.first()
-    if home_id:
-      return cls.get_home_page_with_home_id(home_id=home_id[0]), result.rowcount
-    return None, 0
+    return result.fetchall()
 
   @classmethod
   def get_today_first_new_home(cls):
@@ -413,3 +406,13 @@ class QueryHelper(object):
   @classmethod
   def get_city_ranking_list_with_id(cls, id):
     return CityRankingList.query.filter_by(id=id).first()
+
+  @classmethod
+  def get_newest_all_city_ranking_list(cls):
+    max_date = db.session.query(db.func.max(CityRankingList.date)).scalar()
+    return CityRankingList.query.filter_by(date=max_date).order_by(CityRankingList.score.desc()).all()
+
+  @classmethod
+  def get_newest_follow_city_ranking_list(cls, ids):
+    max_date = db.session.query(db.func.max(CityRankingList.date)).scalar()
+    return CityRankingList.query.filter(CityRankingList.id.in_(ids)).order_by(CityRankingList.score.desc()).all()
