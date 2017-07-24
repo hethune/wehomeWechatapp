@@ -586,7 +586,7 @@ def get_city_collections():
     logger.error("Failed to get city collection list {}".format(e))
     return jsonify(success=False,
       message='Failed to get city collection list')
-  return QueryHelper.to_jso_with_filter(rows_dict=d, columns=columns)
+  return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
 
 @app.route('/api/get_today_new_home', methods=['POST'])
 @uuid_gen
