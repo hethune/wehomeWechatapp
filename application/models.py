@@ -238,6 +238,7 @@ class CityRankingList(db.Model):
   __table_args__ = (
     db.Index("idx_city_id_date_city_rank", "city_id", "date"),
     db.Index("idx_city_id_is_active", "city_id", "is_active"),
+    db.UniqueConstraint('home_id', 'date', name='unique_city_home_id_date'),
   )
 
 class TotalRankingList(db.Model):
