@@ -590,18 +590,19 @@ def get_city_collections():
 
 @app.route('/api/get_today_new_home', methods=['POST'])
 @uuid_gen
-@json_validate(filter=['token', 'third_session'])
+@json_validate(filter=['token'])
 @requires_token
-@requires_auth
 def get_today_new_home():
   incoming = request.get_json()
-  columns = ['total', 'home', 'score', 'map_box_place_name', 'rental_radio', 'increase_radio']
+  columns = ['total', 'home', 'score','map_box_place_name',
+    'rental_income_radio', 'increase_radio', 'pic_url']
   d = {}
   l = []
   try:
-    home_page, total = QueryHelper.get_today_new_home_with_user(user_id=g.current_user['id'])
+    home_page, total, rank_id = QueryHelper.get_today_first_new_home()
     d['total'] = total
     d['home'] = home_page
+    d['pic_url'] = QueryHelper.pares_qiniu_pic(QueryHelper.get_city_ranking_list_with_id(id=rank_id).pic_url)
   except Exception as e:
     logger.error("Failed to get today new home {}".format(e))
     return jsonify(success=False,

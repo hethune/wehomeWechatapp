@@ -392,3 +392,24 @@ class QueryHelper(object):
     if home_id:
       return cls.get_home_page_with_home_id(home_id=home_id[0]), result.rowcount
     return None, 0
+
+  @classmethod
+  def get_today_first_new_home(cls):
+    query = '''
+      SELECT 
+        home_id, id
+      FROM 
+        city_ranking_list 
+      WHERE 
+        date = (SELECT max(date) FROM city_ranking_list LIMIT 1)
+      ORDER BY score DESC LIMIT 1
+    '''
+    result = db.session.execute(query)
+    home_id = result.first()
+    if home_id:
+      return cls.get_home_page_with_home_id(home_id=home_id[0]), result.rowcount, home_id[1]
+    return None, 0, -1
+
+  @classmethod
+  def get_city_ranking_list_with_id(cls, id):
+    return CityRankingList.query.filter_by(id=id).first()
