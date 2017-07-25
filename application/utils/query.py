@@ -91,7 +91,7 @@ class QueryHelper(object):
       headers = {
           'cache-control': "no-cache",
           }
-      response = requests.request("GET", url, headers=headers, params=querystring, proxies=None)
+      response = requests.request("GET", url, headers=headers, params=querystring, proxies=None, timeout=5)
       result = json.loads(response.text)
       if len(result['features'])>0 and result['features'][0]['relevance']>= releveance:
         return result['features'][0]['place_name']
