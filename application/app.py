@@ -9,6 +9,7 @@ import json
 from tasks import send_sms_mobilecode
 import datetime
 from index import session
+import time
 
 logger = app.logger
 HALF_MINUTE = 30
@@ -184,12 +185,13 @@ def home_page():
 @requires_token
 @requires_auth
 def v2_home_page():
+  logger.info('v2_home_page start {}'.format(time.time()))
   incoming = request.get_json()
   if not QueryHelper.validate_query_frequency_grant(user_id=g.current_user['id'], date=TODAY_DATE):
     logger.error("The user's query frequency is out of limit")
     return jsonify(success=False,
       message="The user's query frequency is out of limit"), 409
-
+  logger.info('v2_home_page validate_query_frequency_grant {}'.format(time.time()))
   columns = ['map_box_place_name', 'score', 'house_price_dollar', 'exchange_rate',
     'rent', 'rental_radio', 'increase_radio', 'rental_income_radio',
     'neighborhood_rent_radio', 'city_name', 'city_trend', 'neighborhood_trend',
@@ -201,10 +203,12 @@ def v2_home_page():
       place_name = incoming['place_name']
       if app.config['IS_PARSE_ADDRESS']:
         place_name = QueryHelper.parse_address_by_map_box(place_name=place_name)
+        logger.info('v2_home_page parse_address_by_map_box {}'.format(time.time()))
       home_page = QueryHelper.get_home_page_with_place_name(place_name=place_name)
+      logger.info('v2_home_page get_home_page_with_place_name {}'.format(time.time()))
     else:
       home_page = QueryHelper.get_home_page_with_home_id(home_id=incoming['home_id'])
-
+      logger.info('v2_home_page get_home_page_with_home_id {}'.format(time.time()))
     if not home_page:
       QueryHelper.add_unmatched_place(
         place_name=incoming['place_name'] if incoming.get('place_name', None) else incoming.get('home_id'), type='map_box_place_name')
@@ -221,6 +225,7 @@ def v2_home_page():
     d['exchange_rate'] = QueryHelper.get_index_page().exchange_rate
     d['home_page'] = home_page
     d['favorite'] = True if QueryHelper.get_collection_with_user_home(user_id=g.current_user['id'], home_id=home_page.id) else False
+    logger.info('v2_home_page validate data {}'.format(time.time()))
 
     # log the none value
     validate_d = {
@@ -237,11 +242,13 @@ def v2_home_page():
     for k, v in validate_d.items():
       if not v:
         QueryHelper.add_unmatched_place(place_name=incoming.get('place_name', None), type=k)
+    logger.info('v2_home_page log data {}'.format(time.time()))
 
   except Exception as e:
     logger.error("Failed to get home page list {}".format(e))
     return jsonify(success=False,
       message='Failed to get home page list'), 409
+  logger.info('v2_home_page finish {}'.format(time.time()))
   return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
 
 @app.route('/api/set_feedback', methods=['POST'])
