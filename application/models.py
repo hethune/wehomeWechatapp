@@ -94,6 +94,7 @@ class HomePage(db.Model):
   property_score = db.Column(db.Float(), index=True)
   neighborhood_score = db.Column(db.Float(), index=True)
   pic_url = db.Column(db.String(2048))
+  apt_no = db.Column(db.String(32), index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
   neighborhood = relationship("Neighborhood", back_populates="homepages")
