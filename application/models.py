@@ -337,3 +337,16 @@ class ReadCondition(db.Model):
   __table_args__ = (
     db.Index("idx_readcondition_user_id_city_id_date", "user_id", "city_id", 'rank_date'),
   )
+
+class Picture(db.Model):
+  id = db.Column(db.Integer(), index=True, primary_key=True)
+  pic_url = db.Column(db.String(1024))
+  is_active = db.Column(db.Boolean(), default=False, index=True)
+  # 0 => index page card pic
+  type = db.Column(db.Integer(), index=True)
+  created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
+  updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
+
+  __table_args__ = (
+    db.Index("idx_picture_type_is_active", "type", 'is_active'),
+  )

@@ -636,7 +636,7 @@ def get_today_new_home():
     d['total'] = len(all_homes)
     d['last_updated'] = all_homes[0].updated_at
     d['home'] = home_page
-    d['pic_url'] = QueryHelper.pares_qiniu_pic(QueryHelper.get_city_ranking_list_with_id(id=rank_id).pic_url)
+    d['pic_url'] = QueryHelper.pares_qiniu_pic(QueryHelper.get_index_page_card_pic_url().pic_url)
   except Exception as e:
     logger.error("Failed to get today new home {}".format(e))
     return jsonify(success=False,
