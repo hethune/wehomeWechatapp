@@ -21,7 +21,8 @@ class QueryHelper(object):
     d = {'success':True}
     for k, v in rows_dict.items():
       # handle the dict and integer and float
-      if type(v) == type({}) or type(v) == type(1) or type(v) == type(1.0) or type(v) == type('') or type(v) == type(u'') or type(v) == type(True):
+      if type(v) == type({}) or type(v) == type(1) or type(v) == type(1.0) or type(v) == type('') or type(v) == type(u'') or type(v) == type(True) \
+       or type(datetime.datetime.now()) == type(v):
         d[k] = v
       # handle the model object
       elif (type(v) != type([])) and (v is not None):
