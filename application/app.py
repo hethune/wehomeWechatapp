@@ -737,7 +737,7 @@ def get_today_new_home():
 def get_all_or_follow_homes():
   incoming = request.get_json()
   ranks = None
-  columns = ['house_price_dollar', 'rental_income_radio', 'increase_radio', 'score', 'pic_url', 'city_name']
+  columns = ['house_price_dollar', 'rental_income_radio', 'increase_radio', 'score', 'pic_url', 'city_name', 'home_id']
   d = {}
   l = []
   try:
@@ -755,6 +755,7 @@ def get_all_or_follow_homes():
         'rental_income_radio': rank.home.rental_income_radio,
         'increase_radio': rank.home.increase_radio,
         'score': rank.score,
+        'home_id': rank.home.id,
         'pic_url': QueryHelper.pares_qiniu_pic(rank.pic_url)
         })
   except Exception as e:
