@@ -578,7 +578,7 @@ def set_read_condition():
 @requires_auth
 def get_city_collections():
   incoming = request.get_json()
-  columns = ['city_id', 'city_name']
+  columns = ['city_id', 'city_name', 'increase_radio', 'rental_income_radio']
   d = {}
   l = []
   try:
@@ -586,7 +586,9 @@ def get_city_collections():
     for collection in collecions:
       l.append({
         'city_id': collection.city.id,
-        'city_name': collection.city.city_name
+        'city_name': collection.city.city_name,
+        'increase_radio': collection.city.citypage.rental_income_radio,
+        'rental_income_radio': collection.city.citypage.rental_income_radio,
         })
     d['city_collections'] = l
   except Exception as e:
