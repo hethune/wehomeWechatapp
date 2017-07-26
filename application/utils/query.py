@@ -1,5 +1,5 @@
 from ..models import City, IndexPage, CityPage, HomePage, UnmatchedPlace, FeedBack, User, Phone, Collection, CityCount, CityRankingList, TotalRankingList
-from ..models import SuperRankingList, CarouselFigure, Answer, UserQueryFrequency, CityCollection, ReadCondition
+from ..models import SuperRankingList, CarouselFigure, Answer, UserQueryFrequency, CityCollection, ReadCondition, Picture
 from index import app, db
 from flask import jsonify
 from sqlalchemy import and_
@@ -423,3 +423,7 @@ class QueryHelper(object):
   def get_newest_follow_city_ranking_list(cls, ids):
     max_date = db.session.query(db.func.max(CityRankingList.date)).scalar()
     return CityRankingList.query.filter(CityRankingList.id.in_(ids)).order_by(CityRankingList.score.desc()).all()
+
+  @classmethod
+  def get_index_page_card_pic_url(cls):
+    return Picture.query.filter(and_(Picture.type==0, Picture.is_active=True)).first()
