@@ -426,4 +426,4 @@ class QueryHelper(object):
 
   @classmethod
   def get_index_page_card_pic_url(cls):
-    return Picture.query.filter(and_(Picture.type==0, Picture.is_active=True)).first()
+    return Picture.query.filter(and_(Picture.type==0, Picture.is_active==True)).first()
