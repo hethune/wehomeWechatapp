@@ -627,12 +627,14 @@ def get_city_collections():
 def get_today_new_home():
   incoming = request.get_json()
   columns = ['total', 'home', 'score','map_box_place_name',
-    'rental_income_radio', 'increase_radio', 'pic_url']
+    'rental_income_radio', 'increase_radio', 'pic_url', 'last_updated']
   d = {}
   l = []
   try:
     home_page, total, rank_id = QueryHelper.get_today_first_new_home()
-    d['total'] = total
+    all_homes = QueryHelper.get_newest_all_city_ranking_list()
+    d['total'] = len(all_homes)
+    d['last_updated'] = all_homes[0].updated_at
     d['home'] = home_page
     d['pic_url'] = QueryHelper.pares_qiniu_pic(QueryHelper.get_city_ranking_list_with_id(id=rank_id).pic_url)
   except Exception as e:
