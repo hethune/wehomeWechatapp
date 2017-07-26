@@ -251,6 +251,92 @@ def v2_home_page():
   logger.info('v2_home_page finish {}'.format(time.time()))
   return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
 
+@app.route('/api/v3/home_page', methods=['POST'])
+@uuid_gen
+@json_validate(filter=['token', 'third_session'])
+@requires_token
+@requires_auth
+def v3_home_page():
+  logger.info('v3_home_page start {}'.format(time.time()))
+  incoming = request.get_json()
+  if not QueryHelper.validate_query_frequency_grant(user_id=g.current_user['id'], date=TODAY_DATE):
+    logger.error("The user's query frequency is out of limit v3")
+    return jsonify(success=False,
+      message="The user's query frequency is out of limit"), 409
+  logger.info('v3_home_page validate_query_frequency_grant {}'.format(time.time()))
+  columns = ['map_box_place_name', 'score', 'house_price_dollar', 'exchange_rate',
+    'rent', 'rental_radio', 'increase_radio', 'rental_income_radio',
+    'neighborhood_rent_radio', 'city_name', 'city_trend', 'neighborhood_trend',
+    'adjust_score', 'property_score', 'neighborhood_score', 'apartment', 'home_id', 'apt_no']
+  d = {}
+  l = []
+  home_page = place_name = None
+  try:
+    if not incoming.get('home_id', None):
+      # home_id is None
+      place_name = incoming['place_name']
+      if app.config['IS_PARSE_ADDRESS']:
+        place_name = QueryHelper.parse_address_by_map_box(place_name=place_name)
+        logger.info('v3_home_page parse_address_by_map_box {}'.format(time.time()))
+      home_page = QueryHelper.get_home_page_with_place_name(place_name=place_name)
+      logger.info('v3_home_page get_home_page_with_place_name {}'.format(time.time()))
+    else:
+      # home_id is not None
+      home_page = QueryHelper.get_home_page_with_home_id(home_id=incoming['home_id'])
+      logger.info('v3_home_page get_home_page_with_home_id {}'.format(time.time()))
+
+    if not home_page:
+      QueryHelper.add_unmatched_place(
+        place_name=incoming['place_name'] if incoming.get('place_name', None) else incoming.get('home_id'), type='map_box_place_name')
+      logger.error("Failed to get home page list we cant't find the given place v3")
+      return jsonify(success=False,
+        message="Failed to get home page list we cant't find the given place v3"), 409
+    elif home_page.apt_no and not incoming.get('home_id', None):
+      homes = QueryHelper.get_apartment_no_with_place_name(place_name)
+      print homes
+      for home in homes:
+        l.append({
+          'home_id': home.id,
+          'apt_no': home.apt_no
+          })
+      d['apartment'] = l
+      return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
+
+    d['id'] = home_page.id
+    d['neighborhood_trend'] = json.loads(home_page.neighborhood.house_price_trend) if home_page.neighborhood.house_price_trend else None
+    d['neighborhood_rent_radio']= home_page.neighborhood.neighbor_rental_radio if home_page.neighborhood else None
+    d['neighborhood_score'] = home_page.neighborhood_score if home_page.neighborhood_score else None
+    d['city_trend'] = json.loads(home_page.city.citypage.house_price_trend) if home_page.city and home_page.city.citypage and home_page.city.citypage.house_price_trend else None
+    d['city_name'] = home_page.city.city_name if home_page.city else None
+    d['exchange_rate'] = QueryHelper.get_index_page().exchange_rate
+    d['home_page'] = home_page
+    d['favorite'] = True if QueryHelper.get_collection_with_user_home(user_id=g.current_user['id'], home_id=home_page.id) else False
+    logger.info('v3_home_page validate data {}'.format(time.time()))
+
+    # log the none value
+    validate_d = {
+      'score': home_page.score,
+      'house_price_dollar': home_page.house_price_dollar,
+      'rent': home_page.rent,
+      'rental_radio': home_page.rental_radio,
+      'increase_radio': home_page.increase_radio,
+      'rental_income_radio': home_page.rental_income_radio,
+      'neighborhood_rent_radio': home_page.neighborhood.neighbor_rental_radio,
+      'city_trend': d['city_trend'],
+      'neighborhood_trend': d['neighborhood_trend']
+    }
+    for k, v in validate_d.items():
+      if not v:
+        QueryHelper.add_unmatched_place(place_name=incoming.get('place_name', None), type=k)
+    logger.info('v3_home_page log data {}'.format(time.time()))
+
+  except Exception as e:
+    logger.error("v3 Failed to get home page list {}".format(e))
+    return jsonify(success=False,
+      message='v3 Failed to get home page list'), 409
+  logger.info('v3_home_page finish {}'.format(time.time()))
+  return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
+
 @app.route('/api/set_feedback', methods=['POST'])
 @uuid_gen
 @json_validate(filter=['content', 'token', 'third_session'])

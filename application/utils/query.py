@@ -427,3 +427,9 @@ class QueryHelper(object):
   @classmethod
   def get_index_page_card_pic_url(cls):
     return Picture.query.filter(and_(Picture.type==0, Picture.is_active==True)).first()
+
+  @classmethod
+  def get_apartment_no_with_place_name(cls, place_name):
+    md5 = hashlib.md5()
+    md5.update(place_name.encode("utf-8"))
+    return HomePage.query.filter(and_(HomePage.hash_code==md5.hexdigest(), HomePage.map_box_place_name==place_name)).order_by(HomePage.score.desc()).all()
