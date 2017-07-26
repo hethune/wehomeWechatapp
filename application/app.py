@@ -514,7 +514,7 @@ def get_carouse_figure():
       message='Failed to get carouse figure list')
   return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
 
-@app.route('/api/v2_get_carouse_figure', methods=['POST'])
+@app.route('/api/v2/get_carouse_figure', methods=['POST'])
 @uuid_gen
 @json_validate(filter=['token'])
 @requires_token
@@ -532,9 +532,9 @@ def v2_get_carouse_figure():
         })
     d['carouse_figure'] = l
   except Exception as e:
-    logger.error("Failed to get carouse figure list {}".format(e))
+    logger.error("Failed to get v2 carouse figure list {}".format(e))
     return jsonify(success=False,
-      message='Failed to get carouse figure list')
+      message='Failed to get v2 carouse figure list')
   return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
 
 @app.route('/api/get_answer', methods=['POST'])
