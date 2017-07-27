@@ -503,7 +503,7 @@ def get_city_ranking_list():
     for item in ranks:
       l.append({
         'home_id': item.home.id,
-        'score': item.score,
+        'score': item.home.score,
         'rental_income_radio': item.home.rental_income_radio,
         'rental_radio': item.home.rental_radio,
         'increase_radio': item.home.increase_radio,
@@ -534,7 +534,7 @@ def get_total_ranking_list():
     for item in ranks:
       l.append({
         'home_id': item.home.id,
-        'score': item.score,
+        'score': item.home.score,
         'rental_radio': item.home.rental_radio,
         'increase_radio': item.home.increase_radio,
         'map_box_place_name': item.home.map_box_place_name,
