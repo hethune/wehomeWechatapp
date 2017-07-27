@@ -297,7 +297,8 @@ def v3_home_page():
       for home in homes:
         l.append({
           'home_id': home.id,
-          'apt_no': home.apt_no
+          'apt_no': home.apt_no,
+          'map_box_place_name': home.map_box_place_name
           })
       d['apartment'] = l
       return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
