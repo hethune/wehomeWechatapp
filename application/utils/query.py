@@ -433,3 +433,16 @@ class QueryHelper(object):
     md5 = hashlib.md5()
     md5.update(place_name.encode("utf-8"))
     return HomePage.query.filter(and_(HomePage.hash_code==md5.hexdigest(), HomePage.map_box_place_name==place_name)).order_by(HomePage.score.desc()).all()
+
+  @classmethod
+  def get_home_page_id_with_place_name(cls, place_name):
+    # the method get home by silimar
+    query = '''
+      SELECT 
+        id, map_box_place_name <-> '{place_name}' AS smar 
+      FROM 
+        home_page 
+      ORDER BY smar LIMIT 1
+    '''.format(place_name=place_name)
+    result = db.session.execute(query)
+    return result.fetchall()
