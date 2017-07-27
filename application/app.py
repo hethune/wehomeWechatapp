@@ -291,11 +291,9 @@ def v3_home_page():
       if app.config['IS_SIMILAR']:
         result = QueryHelper.get_home_page_id_with_place_name(place_name=place_name)
         home_page = QueryHelper.get_home_page_with_home_id(home_id=result[0][0])
-        print home_page, '*'*30
 
     if home_page and home_page.apt_no and not incoming.get('home_id', None):
       homes = QueryHelper.get_apartment_no_with_place_name(place_name)
-      print homes
       for home in homes:
         l.append({
           'home_id': home.id,
