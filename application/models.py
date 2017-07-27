@@ -71,7 +71,7 @@ class HomePage(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
   neighbor_id = db.Column(db.Integer(), db.ForeignKey("neighborhood.id", ondelete="CASCADE"), index=True, nullable=False)
   city_id = db.Column(db.Integer(), db.ForeignKey("city.id", ondelete="CASCADE"), index=True)
-  source_id = db.Column(db.String(255), index=True)
+  source_id = db.Column(db.String(255), index=True, unique=True)
   source = db.Column(db.String(255), index=True)
   map_box_place_name = db.Column(db.Text())
   address = db.Column(db.Text(), index=True)
