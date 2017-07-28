@@ -1,6 +1,6 @@
 from ..models import City, IndexPage, CityPage, HomePage, UnmatchedPlace, FeedBack, User, Phone, Collection, CityCount, CityRankingList, TotalRankingList
 from ..models import SuperRankingList, CarouselFigure, Answer, UserQueryFrequency, CityCollection, ReadCondition, Picture
-from index import app, db
+from index import app, db, bcrypt
 from flask import jsonify
 from sqlalchemy import and_
 import hashlib
@@ -447,3 +447,11 @@ class QueryHelper(object):
     '''.format(place_name=place_name)
     result = db.session.execute(query)
     return result.fetchall()
+
+  @classmethod
+  def get_user_with_phone_and_country_and_password(cls, phone, country, password):
+    user = User.query.filter_by(phone=phone, country=country).first()
+    if user and bcrypt.check_password_hash(user.password, password):
+      return user
+    else:
+      return None
