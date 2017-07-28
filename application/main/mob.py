@@ -10,6 +10,7 @@ logger = app.logger
 
 @mob.route('/register', methods=['POST'])
 @json_validate(filter=['token', 'userName', 'gender', 'country', 'phone', 'password', 'code'])
+@requires_token
 def register():
   incoming = request.get_json()
   user = User(openid=None, nick_name=incoming["userName"], gender=incoming['gender'], language=None, city=None, country=incoming["country"],
@@ -33,3 +34,17 @@ def register():
     third_session=generate_token(user=user, session_key=None),
     success=True
   )
+
+@mob.route('/login', methods=['POST'])
+@json_validate(filter=['token', 'phone', 'password', 'country'])
+@requires_token
+def login():
+  incoming = request.get_json()
+  user = QueryHelper.get_user_with_phone_and_country_and_password(phone=incoming['phone'],
+    country=incoming['country'], password=incoming['password'])
+  if user:
+    return jsonify(
+      third_session=generate_token(user=user, session_key=None),
+      success=True
+    )
+  return jsonify(success=True, message='login failed'), 403

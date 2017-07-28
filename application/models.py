@@ -175,6 +175,10 @@ class User(db.Model):
   def hashed_password(password):
     return bcrypt.generate_password_hash(password)
 
+  __table_args__ = (
+    db.Index("idx_user_phone_country", "phone", "country"),
+  )
+
 class Phone(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
   phone = db.Column(db.String(255))
