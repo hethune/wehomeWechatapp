@@ -432,7 +432,8 @@ class QueryHelper(object):
   def get_apartment_no_with_place_name(cls, place_name):
     md5 = hashlib.md5()
     md5.update(place_name.encode("utf-8"))
-    return HomePage.query.filter(and_(HomePage.hash_code==md5.hexdigest(), HomePage.map_box_place_name==place_name)).order_by(HomePage.score.desc()).all()
+    return HomePage.query.filter(and_(HomePage.hash_code==md5.hexdigest(),
+      HomePage.map_box_place_name==place_name, HomePage.apt_no.isnot(None))).order_by(HomePage.score.desc()).all()
 
   @classmethod
   def get_home_page_id_with_place_name(cls, place_name):
