@@ -10,11 +10,12 @@ from tasks import send_sms_mobilecode
 import datetime
 from index import session
 import time
+from application.main.mob import mob as mob_blueprint
 
+app.register_blueprint(mob_blueprint, url_prefix='/api/mob')
 logger = app.logger
 HALF_MINUTE = 30
 TODAY_DATE = datetime.date.today().strftime('%Y-%m-%d')
-
 
 @app.route('/api/index_page', methods=['POST'])
 @uuid_gen
