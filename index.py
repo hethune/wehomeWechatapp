@@ -4,10 +4,13 @@ from config import BaseConfig
 import logging
 from celery import Celery
 from application.utils.cache import RedisCache
+from flask_bcrypt import Bcrypt
+
 app = Flask(__name__)
 app.config.from_object(BaseConfig)
 app.secret_key = app.config['APP_SECRET_KEY']
 db = SQLAlchemy(app)
+bcrypt = Bcrypt(app)
 session = RedisCache(host=app.config['REDIS_SESSION_HOST'], port=app.config['REDIS_SESSION_PORT'],
   password=app.config['REDIS_SESSION_PWD'], dbname=app.config['REDIS_SESSION_DB_NAME'])
 
