@@ -1,4 +1,4 @@
-from index import db
+from index import db, bcrypt
 # from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import relationship
 import datetime
@@ -158,7 +158,7 @@ class User(db.Model):
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
-  def __init__(self, openid, nick_name, gender, language, city, province, country, avatar_url, phone=None):
+  def __init__(self, openid, nick_name, gender, language, city, province, country, avatar_url, phone=None, type=0, password=None):
     self.openid = openid
     self.nick_name = nick_name
     self.gender = gender
@@ -168,6 +168,12 @@ class User(db.Model):
     self.country = country
     self.avatar_url = avatar_url
     self.phone = phone
+    self.type = type
+    self.password = User.hashed_password(password) if password else password
+
+  @staticmethod
+  def hashed_password(password):
+    return bcrypt.generate_password_hash(password)
 
 class Phone(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
