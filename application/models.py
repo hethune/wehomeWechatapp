@@ -150,6 +150,11 @@ class User(db.Model):
   country = db.Column(db.String(255), index=True)
   country_code = db.Column(db.String(16), index=True)
   avatar_url = db.Column(db.String(1024))
+  # 0 or null => mini program
+  # 1 => app
+  type = db.Column(db.Integer(), index=True)
+  # mini program is null
+  password = db.Column(db.String(255), index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
