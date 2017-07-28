@@ -269,7 +269,8 @@ def v3_home_page():
   columns = ['map_box_place_name', 'score', 'house_price_dollar', 'exchange_rate',
     'rent', 'rental_radio', 'increase_radio', 'rental_income_radio',
     'neighborhood_rent_radio', 'city_name', 'city_trend', 'neighborhood_trend',
-    'adjust_score', 'property_score', 'neighborhood_score', 'apartment', 'home_id', 'apt_no']
+    'adjust_score', 'property_score', 'neighborhood_score', 'apartment', 'home_id', 'apt_no',
+    'bedroom', 'bathroom']
   d = {}
   l = []
   home_page = place_name = None
