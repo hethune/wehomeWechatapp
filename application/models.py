@@ -177,6 +177,7 @@ class User(db.Model):
 
   __table_args__ = (
     db.Index("idx_user_phone_country", "phone", "country"),
+    db.UniqueConstraint("phone", name='unique_user_phone'),
   )
 
 class Phone(db.Model):
