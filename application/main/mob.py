@@ -2,6 +2,7 @@ from flask import request, jsonify, g
 from flask import Blueprint
 from index import app, db
 from ..models import User
+from sqlalchemy.exc import IntegrityError
 from ..utils.query import QueryHelper
 from ..utils.helper import uuid_gen, json_validate, requires_token, generate_token, verify_token, requires_auth, id_generator
 
@@ -27,8 +28,8 @@ def register():
   try:
     db.session.commit()
   except IntegrityError as e:
-    logger.warning("Failed User Creation: phone {}, email {}, {}".format(incoming["phone"], incoming["email"], e))
-    return jsonify(message="User with that email or phone already exists"), 409
+    logger.warning("Failed User Creation: phone {}, {}".format(incoming["phone"], e))
+    return jsonify(message="User with that phone already exists"), 409
 
   return jsonify(
     third_session=generate_token(user=user, session_key=None),
