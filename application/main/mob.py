@@ -59,14 +59,14 @@ def get_hot_cities():
   d = {}
   l = []
   try:
-    cities = QueryHelper.get_cities()
+    cities = QueryHelper.get_cities_filter_id(min_id=1, max_id=10)
     for city in cities:
       l.append({
         'city_id': city.id,
         'city_name': city.city_name,
-        'pic_url': city.citypage.pic_url,
-        'increase_radio': city.citypage.increase_radio,
-        'rental_income_radio': city.citypage.rental_income_radio,
+        'pic_url': city.citypage.pic_url if city.citypage else None,
+        'increase_radio': city.citypage.increase_radio  if city.citypage else None,
+        'rental_income_radio': city.citypage.rental_income_radio if city.citypage else None,
         })
       d['hot_cities'] = l
   except Exception as e:

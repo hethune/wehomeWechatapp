@@ -52,6 +52,10 @@ class QueryHelper(object):
     return City.query.all()
 
   @classmethod
+  def get_cities_filter_id(cls, min_id, max_id):
+    return City.query.filter(City.id.between(min_id, max_id)).all()
+
+  @classmethod
   def get_city_page_with_city_id(cls, city_id):
     return CityPage.query.filter_by(city_id=city_id).first()
 
