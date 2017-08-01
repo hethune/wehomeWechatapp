@@ -2,9 +2,10 @@ from flask import request, jsonify, g
 from flask import Blueprint
 from index import app, db
 from ..models import User
+from index import session
 from sqlalchemy.exc import IntegrityError
 from ..utils.query import QueryHelper
-from ..utils.helper import uuid_gen, json_validate, requires_token, generate_token, verify_token, requires_auth, id_generator
+from ..utils.helper import uuid_gen, json_validate, requires_token, generate_token, verify_token, requires_auth_app, id_generator
 
 mob = Blueprint('mob', __name__)
 logger = app.logger
@@ -60,7 +61,8 @@ def login():
       return jsonify(success=True, message='login failed'), 403
     user = QueryHelper.get_user_with_phone_and_country(phone=incoming['phone'],
       country=incoming['country'])
-
+    
+  session[str(user.id)] = third_session
   return jsonify(
     third_session=generate_token(user=user, session_key=None), success=True)
 
