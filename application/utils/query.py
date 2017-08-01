@@ -459,3 +459,7 @@ class QueryHelper(object):
       return user
     else:
       return None
+
+  @classmethod
+  def get_app_rank_pic_with_type(cls, type):
+    return Picture.query.filter(and_(Picture.type==type, Picture.is_active==True)).first()

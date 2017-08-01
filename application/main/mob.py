@@ -88,3 +88,34 @@ def get_hot_cities():
     return jsonify(success=False,
       message='Failed to get hot city list')
   return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
+
+@mob.route('/get_total_super_rank', methods=['POST'])
+@uuid_gen
+@json_validate(filter=['token'])
+@requires_token
+def get_total_super_rank():
+  columns = ['index', 'address', 'score', 'ratio', 'total_pic', 'super_pic']
+  d = {}
+  l = []
+  try:
+    totals = QueryHelper.get_total_ranking_list_with_city()
+    for idx, rank in enumerate(totals[0:3]):
+      l.append({
+        'index': idx,
+        'address': rank.home.map_box_place_name,
+        'score': rank.home.score,
+        })
+    d['total_pic'] = QueryHelper.pares_qiniu_pic(QueryHelper.get_app_rank_pic_with_type(type=1))
+    supers = QueryHelper.get_super_ranking_list_with_city()
+    for idx, rank in enumerate(supers[0:3]):
+      l.append({
+        'index': idx,
+        'address': rank.home.map_box_place_name,
+        'ratio': (rank.rencent_price-rank.history_price)/rank.history_price,
+        })
+    d['super_pic'] = QueryHelper.pares_qiniu_pic(QueryHelper.get_app_rank_pic_with_type(type=2))
+  except Exception as e:
+    logger.error("Failed to get total super list {}".format(e))
+    return jsonify(success=False,
+      message='Failed to get total super list')
+  return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
