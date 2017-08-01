@@ -49,3 +49,28 @@ def login():
       success=True
     )
   return jsonify(success=True, message='login failed'), 403
+
+@mob.route('/get_hot_cities', methods=['POST'])
+@uuid_gen
+@json_validate(filter=['token'])
+@requires_token
+def get_hot_cities():
+  columns = ['id', 'city_name', 'pic_url', 'increase_radio', 'rental_income_radio']
+  d = {}
+  l = []
+  try:
+    cities = QueryHelper.get_cities()
+    for city in cities:
+      l.append({
+        'city_id': city.id,
+        'city_name': city.city_name,
+        'pic_url': city.citypage.pic_url,
+        'increase_radio': city.citypage.increase_radio,
+        'rental_income_radio': city.citypage.rental_income_radio,
+        })
+      d['hot_cities'] = l
+  except Exception as e:
+    logger.error("Failed to get hot city list {}".format(e))
+    return jsonify(success=False,
+      message='Failed to get hot city list')
+  return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
