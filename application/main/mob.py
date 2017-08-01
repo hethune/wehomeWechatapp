@@ -55,7 +55,7 @@ def login():
 @json_validate(filter=['token'])
 @requires_token
 def get_hot_cities():
-  columns = ['id', 'city_name', 'pic_url', 'increase_radio', 'rental_income_radio']
+  columns = ['city_id', 'city_name', 'pic_url', 'increase_radio', 'rental_income_radio']
   d = {}
   l = []
   try:
