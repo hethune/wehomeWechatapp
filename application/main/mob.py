@@ -37,18 +37,32 @@ def register():
   )
 
 @mob.route('/login', methods=['POST'])
-@json_validate(filter=['token', 'phone', 'password', 'country'])
+@json_validate(filter=['token', 'phone', 'code', 'country'])
 @requires_token
 def login():
   incoming = request.get_json()
-  user = QueryHelper.get_user_with_phone_and_country_and_password(phone=incoming['phone'],
-    country=incoming['country'], password=incoming['password'])
-  if user:
-    return jsonify(
-      third_session=generate_token(user=user, session_key=None),
-      success=True
-    )
-  return jsonify(success=True, message='login failed'), 403
+
+  # Verify phone number
+  if not QueryHelper.verify_sms_code(phone=incoming['phone'], country=incoming['country'], code=incoming['code']):
+    logger.warning("Failed SMS Verification: {} entered a invalid code {}".format(incoming["phone"], incoming["country"], incoming["code"]))
+    return jsonify(message="Phone has not been verified", success=False), 409  
+
+  user = QueryHelper.get_user_with_phone_and_country(phone=incoming['phone'],
+    country=incoming['country'])
+  if not user:
+    user = User(openid=None, nick_name=incoming["phone"][0:3]+'*'*4+incoming['phone'][7:], gender=None, language=None, city=None, country=incoming["country"],
+    province=None, avatar_url=None, phone=incoming["phone"], type=1, password=None)
+    try:
+      db.session.add(user)
+      db.session.commit()
+    except IntegrityError as e:
+      logger.warning("Failed User Creation: phone {}, {}".format(incoming["phone"], e))
+      return jsonify(success=True, message='login failed'), 403
+    user = QueryHelper.get_user_with_phone_and_country(phone=incoming['phone'],
+      country=incoming['country'])
+
+  return jsonify(
+    third_session=generate_token(user=user, session_key=None), success=True)
 
 @mob.route('/get_hot_cities', methods=['POST'])
 @uuid_gen

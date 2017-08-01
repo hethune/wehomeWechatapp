@@ -453,9 +453,9 @@ class QueryHelper(object):
     return result.fetchall()
 
   @classmethod
-  def get_user_with_phone_and_country_and_password(cls, phone, country, password):
+  def get_user_with_phone_and_country(cls, phone, country):
     user = User.query.filter_by(phone=phone, country=country).first()
-    if user and bcrypt.check_password_hash(user.password, password):
+    if user:
       return user
     else:
       return None
