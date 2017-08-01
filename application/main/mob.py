@@ -5,7 +5,7 @@ from ..models import User
 from index import session
 from sqlalchemy.exc import IntegrityError
 from ..utils.query import QueryHelper
-from ..utils.helper import uuid_gen, json_validate, requires_token, generate_token, verify_token, requires_auth_app, id_generator
+from ..utils.helper import uuid_gen, json_validate, requires_token, generate_token, verify_token, id_generator
 
 mob = Blueprint('mob', __name__)
 logger = app.logger
