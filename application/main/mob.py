@@ -61,10 +61,11 @@ def login():
       return jsonify(success=True, message='login failed'), 403
     user = QueryHelper.get_user_with_phone_and_country(phone=incoming['phone'],
       country=incoming['country'])
-    
+  
+  third_session = generate_token(user=user, session_key=None)
   session[str(user.id)] = third_session
   return jsonify(
-    third_session=generate_token(user=user, session_key=None), success=True)
+    third_session=third_session, success=True)
 
 @mob.route('/get_hot_cities', methods=['POST'])
 @uuid_gen
