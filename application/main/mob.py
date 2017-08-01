@@ -96,8 +96,8 @@ def get_hot_cities():
 def get_total_super_rank():
   columns = ['index', 'address', 'score', 'ratio', 'total_pic', 'super_pic']
   d = {}
-  l = []
   try:
+    l = []
     totals = QueryHelper.get_total_ranking_list_with_city()
     for idx, rank in enumerate(totals[0:3]):
       l.append({
@@ -107,6 +107,8 @@ def get_total_super_rank():
         })
     d['total_pic'] = QueryHelper.pares_qiniu_pic(QueryHelper.get_app_rank_pic_with_type(type=1).pic_url)
     supers = QueryHelper.get_super_ranking_list_with_city()
+    d['total_top_three'] = l
+    l = []
     for idx, rank in enumerate(supers[0:3]):
       l.append({
         'index': idx,
@@ -114,6 +116,7 @@ def get_total_super_rank():
         'ratio': (rank.rencent_price-rank.history_price)/rank.history_price,
         })
     d['super_pic'] = QueryHelper.pares_qiniu_pic(QueryHelper.get_app_rank_pic_with_type(type=2).pic_url)
+    d['super_top_three'] = l
   except Exception as e:
     logger.error("Failed to get total super list {}".format(e))
     return jsonify(success=False,
