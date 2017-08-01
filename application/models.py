@@ -359,6 +359,8 @@ class Picture(db.Model):
   pic_url = db.Column(db.String(1024))
   is_active = db.Column(db.Boolean(), default=False, index=True)
   # 0 => index page card pic
+  # 1 => app total rank cover pic
+  # 2 => app super rank cover pic
   type = db.Column(db.Integer(), index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
