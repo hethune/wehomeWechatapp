@@ -105,7 +105,7 @@ def get_total_super_rank():
         'address': rank.home.map_box_place_name,
         'score': rank.home.score,
         })
-    d['total_pic'] = QueryHelper.pares_qiniu_pic(QueryHelper.get_app_rank_pic_with_type(type=1))
+    d['total_pic'] = QueryHelper.pares_qiniu_pic(QueryHelper.get_app_rank_pic_with_type(type=1).pic_url)
     supers = QueryHelper.get_super_ranking_list_with_city()
     for idx, rank in enumerate(supers[0:3]):
       l.append({
@@ -113,7 +113,7 @@ def get_total_super_rank():
         'address': rank.home.map_box_place_name,
         'ratio': (rank.rencent_price-rank.history_price)/rank.history_price,
         })
-    d['super_pic'] = QueryHelper.pares_qiniu_pic(QueryHelper.get_app_rank_pic_with_type(type=2))
+    d['super_pic'] = QueryHelper.pares_qiniu_pic(QueryHelper.get_app_rank_pic_with_type(type=2).pic_url)
   except Exception as e:
     logger.error("Failed to get total super list {}".format(e))
     return jsonify(success=False,
