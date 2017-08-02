@@ -81,7 +81,7 @@ def get_hot_cities():
       l.append({
         'city_id': city.id,
         'city_name': city.city_name,
-        'pic_url': QueryHelper.pares_qiniu_pic(city.citypage.pic_url) if city.citypage else None,
+        'pic_url': QueryHelper.pares_qiniu_pic(city.citypage.app_pic_url) if city.citypage else None,
         'increase_radio': city.citypage.increase_radio  if city.citypage else None,
         'rental_income_radio': city.citypage.rental_income_radio if city.citypage else None,
         })
