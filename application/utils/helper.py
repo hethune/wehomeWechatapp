@@ -29,12 +29,14 @@ def json_validate(f=None, filter=[]):
   def decorated(*args, **kwargs):
     incoming = request.get_json()
     if incoming is None:
+      logger.error('Parameters not compatible')
       return jsonify(success=False,
         message='Parameters not compatible'), 400
     for item in filter:
       if item not in incoming.keys():
+        logger.error('Parameters not compatible')
         return jsonify(success=False,
-        message='Parameters not compatible'), 400
+          message='Parameters not compatible'), 400
     return f(*args, **kwargs)
   return decorated
 
