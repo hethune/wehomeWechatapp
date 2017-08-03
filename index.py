@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from config import BaseConfig
 import logging
 from celery import Celery
-from application.utils.cache import RedisCache
+from application.utils.cache import RedisCache, HomeCache
 from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
@@ -13,6 +13,8 @@ db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 session = RedisCache(host=app.config['REDIS_SESSION_HOST'], port=app.config['REDIS_SESSION_PORT'],
   password=app.config['REDIS_SESSION_PWD'], dbname=app.config['REDIS_SESSION_DB_NAME'])
+home_cache = HomeCache(host=app.config['REDIS_SESSION_HOST'], port=app.config['REDIS_SESSION_PORT'],
+  password=app.config['REDIS_SESSION_PWD'], db=2)
 
 # logger
 class RequestIdFilter(logging.Filter):

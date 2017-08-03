@@ -5,10 +5,11 @@ from .utils.helper import uuid_gen, json_validate, requires_token, generate_toke
 from .utils.query import QueryHelper
 from .utils.cache import RedisCache
 from flask import request, jsonify, g
+from flask.json import dumps
 import json
 from tasks import send_sms_mobilecode
 import datetime
-from index import session
+from index import session, home_cache
 import time
 from application.main.mob import mob as mob_blueprint
 
@@ -281,10 +282,17 @@ def v3_home_page():
       if app.config['IS_PARSE_ADDRESS']:
         place_name = QueryHelper.parse_address_by_map_box(place_name=place_name)
         logger.info('v3_home_page parse_address_by_map_box {}'.format(time.time()))
+
+      if home_cache[place_name]:
+        return QueryHelper.to_response(data=json.loads(home_cache[place_name]))
+
       home_page = QueryHelper.get_home_page_with_place_name(place_name=place_name)
       logger.info('v3_home_page get_home_page_with_place_name {}'.format(time.time()))
     else:
-      # home_id is not None
+      # home_id is not None get home cache by home_id
+      if home_cache[str(incoming['home_id'])]:
+        return QueryHelper.to_response(data=json.loads(home_cache[str(incoming['home_id'])]))
+
       home_page = QueryHelper.get_home_page_with_home_id(home_id=incoming['home_id'])
       logger.info('v3_home_page get_home_page_with_home_id {}'.format(time.time()))
 
@@ -303,7 +311,10 @@ def v3_home_page():
           'map_box_place_name': home.map_box_place_name
           })
       d['apartment'] = l
-      return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
+      result_dict = QueryHelper.to_dict_with_filter(rows_dict=d, columns=columns)
+      result_json = dumps(result_dict)
+      home_cache.set_key_value(name=home.map_box_place_name, value=result_json, expiration=app.config['REDIS_HOME_CACHE_EXPIRE_TIME'])
+      return jsonify(result_dict), 200
     elif not home_page:
       QueryHelper.add_unmatched_place(
         place_name=incoming['place_name'] if incoming.get('place_name', None) else incoming.get('home_id'), type='map_box_place_name')
@@ -344,7 +355,11 @@ def v3_home_page():
     return jsonify(success=False,
       message='v3 Failed to get home page list'), 409
   logger.info('v3_home_page finish {}'.format(time.time()))
-  return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
+  result_dict = QueryHelper.to_dict_with_filter(rows_dict=d, columns=columns)
+  result_json = dumps(result_dict)
+  home_cache.set_key_value(name=home_page.id, value=result_json, expiration=app.config['REDIS_HOME_CACHE_EXPIRE_TIME'])
+  home_cache.set_key_value(name=home_page.map_box_place_name, value=result_json, expiration=app.config['REDIS_HOME_CACHE_EXPIRE_TIME'])
+  return jsonify(result_dict), 200
 
 @app.route('/api/set_feedback', methods=['POST'])
 @uuid_gen
