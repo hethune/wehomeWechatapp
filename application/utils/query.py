@@ -463,3 +463,27 @@ class QueryHelper(object):
   @classmethod
   def get_app_rank_pic_with_type(cls, type):
     return Picture.query.filter(and_(Picture.type==type, Picture.is_active==True)).first()
+
+  @classmethod
+  def get_wechat_access_token_for_app(cls, code):
+    querystring = {
+      'appid': app.config['WECHAT_APP_ID_FOR_APP'],
+      'secret': app.config['WECHAT_SECRET_FOR_APP'],
+      'code': code,
+      'grant_type': app.config['WECHAT_GRANT_TYPE_FOR_APP']
+      }
+    response = requests.request("GET", app.config['WEHCAT_GET_ACCESS_TOKEN_URL'], params=querystring)
+    return json.loads(response.text)
+
+  @classmethod
+  def get_wechat_user_info_for_app(cls, access_token, openid):
+    querystring = {
+      'access_token': access_token,
+      'openid': openid
+      }
+    response = requests.request("GET", app.config['WEHCAT_GET_USERINFO_URL'], params=querystring)
+    return json.loads(response.text)
+
+  @classmethod
+  def get_user_with_openid(cls, openid):
+    return User.query.filter_by(openid=openid).first()
