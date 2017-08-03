@@ -58,7 +58,7 @@ def login():
       db.session.commit()
     except IntegrityError as e:
       logger.warning("Failed User Creation: phone {}, {}".format(incoming["phone"], e))
-      return jsonify(success=True, message='login failed'), 403
+      return jsonify(success=False, message='login failed'), 403
     user = QueryHelper.get_user_with_phone_and_country(phone=incoming['phone'],
       country=incoming['country'])
   
@@ -125,3 +125,35 @@ def get_total_super_rank():
     return jsonify(success=False,
       message='Failed to get total super list')
   return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
+
+@mob.route('/wechat/login', methods=['POST'])
+@uuid_gen
+@json_validate(filter=['token', 'code'])
+@requires_token
+def wechat_login():
+  incoming = request.get_json()
+  # get access token
+  access_token = QueryHelper.get_wechat_access_token_for_app(code=incoming['code'])
+  if not access_token.get('access_token', None):
+    logger.warning("Get wechat access_token failed {}".format(incoming["code"]))
+    return jsonify(success=False, message='Get wechat access_token failed'), 403
+  # get user info
+  user_info = QueryHelper.get_wechat_user_info_for_app(access_token=access_token['access_token'],
+    openid=access_token['openid'])
+  print user_info, '*'*30
+  user = QueryHelper.get_user_with_openid(openid=user_info['openid'])
+  if not user:
+    user = User(openid=user_info['openid'], nick_name=user_info['nickname'], gender=user_info['sex'], language=None, city=None, country=user_info["country"],
+    province=user_info['province'], avatar_url=user_info['headimgurl'], phone=None, type=1, password=None)
+    try:
+      db.session.add(user)
+      db.session.commit()
+    except IntegrityError as e:
+      logger.warning("Failed User Creation: phone openid {}, {}".format(user_info["openid"], e))
+      return jsonify(success=False, message='login failed'), 403
+    user = QueryHelper.get_user_with_openid(openid=user_info['openid'])
+  
+  third_session = generate_token(user=user, session_key=None)
+  session[str(user.id)] = third_session
+  return jsonify(
+    third_session=third_session, success=True)
