@@ -140,20 +140,24 @@ def wechat_login():
   # get user info
   user_info = QueryHelper.get_wechat_user_info_for_app(access_token=access_token['access_token'],
     openid=access_token['openid'])
-  print user_info, '*'*30
   user = QueryHelper.get_user_with_openid(openid=user_info['openid'])
-  if not user:
-    user = User(openid=user_info['openid'], nick_name=user_info['nickname'], gender=user_info['sex'], language=None, city=None, country=user_info["country"],
-    province=user_info['province'], avatar_url=user_info['headimgurl'], phone=None, type=1, password=None)
-    try:
+  try:
+    if not user:
+      user = User(openid=user_info['openid'], nick_name=user_info['nickname'].encode('iso8859-1'), gender=user_info['sex'], language=None, city=None, country=user_info["country"],
+      province=user_info['province'], avatar_url=user_info['headimgurl'], phone=None, type=1, password=None)
       db.session.add(user)
       db.session.commit()
-    except IntegrityError as e:
-      logger.warning("Failed User Creation: phone openid {}, {}".format(user_info["openid"], e))
-      return jsonify(success=False, message='login failed'), 403
-    user = QueryHelper.get_user_with_openid(openid=user_info['openid'])
+      user = QueryHelper.get_user_with_openid(openid=user_info['openid'])
+    else:
+      user.nick_name = user_info['nickname'].encode('iso8859-1')
+      user.avatar_url = user_info['headimgurl']
+      db.session.merge(user)
+      db.session.commit()
+  except IntegrityError as e:
+    logger.warning("Failed User Creation: phone openid {}, {}".format(user_info["openid"], e))
+    return jsonify(success=False, message='login failed'), 403
   
   third_session = generate_token(user=user, session_key=None)
   session[str(user.id)] = third_session
-  return jsonify(
+  return jsonify(nick_name=user.nick_name, avatar_url=user.avatar_url,
     third_session=third_session, success=True)
