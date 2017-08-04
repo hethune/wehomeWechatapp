@@ -720,7 +720,7 @@ def get_city_collections():
       l.append({
         'city_id': collection.city.id,
         'city_name': collection.city.city_name,
-        'increase_radio': collection.city.citypage.rental_income_radio,
+        'increase_radio': collection.city.citypage.increase_radio,
         'rental_income_radio': collection.city.citypage.rental_income_radio,
         })
     d['city_collections'] = l
