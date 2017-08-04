@@ -11,6 +11,7 @@ from sqlalchemy.exc import DataError, IntegrityError
 import datetime
 import sys
 from qiniu import Auth
+from flask.json import dumps
 
 FIVE_MINUTES = 60*5
 
@@ -42,6 +43,33 @@ class QueryHelper(object):
       else:
         d[k] = {}
     return jsonify(d), 200
+
+  @classmethod
+  def to_dict_with_filter(cls, rows_dict, columns):
+    d = {'success':True}
+    for k, v in rows_dict.items():
+      # handle the dict and integer and float
+      if type(v) == type({}) or type(v) == type(1) or type(v) == type(1.0) or type(v) == type('') or type(v) == type(u'') or type(v) == type(True) \
+       or type(datetime.datetime.now()) == type(v):
+        d[k] = v
+      # handle the model object
+      elif (type(v) != type([])) and (v is not None):
+        d[k] = {_k:_v for _k, _v in v.__dict__.items() if _k in columns}
+      # handle the list
+      elif v is not None:
+        l = []
+        for item in v:
+          # handle the model object
+          if type(item) != type({}):
+            l.append({_k:_v for _k, _v in item.__dict__.items() if _k in columns})
+          # handle the dict  
+          else:
+            l.append({_k:_v for _k, _v in item.items() if _k in columns})
+        d[k] = l
+      # handle the None  
+      else:
+        d[k] = {}
+    return d
 
   @classmethod
   def get_index_page(cls):
@@ -487,3 +515,11 @@ class QueryHelper(object):
   @classmethod
   def get_user_with_openid(cls, openid):
     return User.query.filter_by(openid=openid).first()
+
+  @classmethod
+  def to_response(cls, data):
+    return app.response_class(
+        response=(dumps(data), '\n'),
+        status=200,
+        mimetype='application/json'
+    )
