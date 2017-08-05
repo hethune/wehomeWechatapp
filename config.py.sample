@@ -1,0 +1,39 @@
+class BaseConfig(object):
+  DEBUG = True
+  # db uri
+  SQLALCHEMY_DATABASE_URI = ""
+  SQLALCHEMY_TRACK_MODIFICATIONS = True
+  # app's token
+  WECHAT_TOKEN = ''
+  # map box access token
+  MAP_BOX_ACCESSTOKEN = ''
+  IS_PARSE_ADDRESS = True
+  WECHAT_APP_ID = ''
+  WECHAT_APP_SECRET = ''
+  # get wechat mini program's code
+  WECHAT_APP_CODE_URL = 'https://api.weixin.qq.com/sns/jscode2session'
+  WECHAT_APP_GRANT_TYPE = 'authorization_code'
+  # for flask session but not used
+  APP_SECRET_KEY = ''
+  CELERY_BROKER_URL = "redis://localhost:6379/"
+  YUNPIAN_KEY = ""
+  NEXMO_KEY = ""
+  NEXMO_SECRET = ""
+  REDIS_SESSION_PORT = '6379'
+  REDIS_SESSION_HOST = 'localhost'
+  REDIS_SESSION_PWD = ''
+  REDIS_SESSION_DB_NAME = 'session'
+  QINIU_AK = ''
+  QINIU_SK = ''
+  QINIU_DOMAIN = 'http://ot2sj5ee6.bkt.clouddn.com'
+  QINIU_HOME_PREFIX = 'image/home/'
+  QINIU_EXPIRES = 60*60
+  USER_QUERY_COUNT = 3
+  IS_SIMILAR = False
+  WECHAT_APP_ID_FOR_APP = ''
+  WECHAT_SECRET_FOR_APP = ''
+  WECHAT_GRANT_TYPE_FOR_APP = 'authorization_code'
+  WEHCAT_GET_ACCESS_TOKEN_URL = 'https://api.weixin.qq.com/sns/oauth2/access_token'
+  WEHCAT_GET_USERINFO_URL = 'https://api.weixin.qq.com/sns/userinfo'
+  REDIS_HOME_CACHE_DB_NAME = 'homecache'
+  REDIS_HOME_CACHE_EXPIRE_TIME = 60 * 5
