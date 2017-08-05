@@ -76,7 +76,7 @@ class HomePage(db.Model):
   source = db.Column(db.String(255), index=True)
   map_box_place_name = db.Column(db.Text())
   address = db.Column(db.Text(), index=True)
-  score = db.Column(db.Float())
+  score = db.Column(db.Float(), index=True)
   house_price_dollar = db.Column(db.Float())
   rent = db.Column(db.Float())
   size = db.Column(db.Integer())

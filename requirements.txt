@@ -22,6 +22,6 @@ tqdm==4.14.0
 urllib3==1.21.1
 Werkzeug==0.12.2
 celery==4.0.2
-reids==2.10.5
+redis==2.10.5
 qiniu==7.1.4
 flask_bcrypt
