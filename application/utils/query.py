@@ -236,7 +236,7 @@ class QueryHelper(object):
       phone.is_verified = True
       db.session.merge(phone)
       db.session.commit()
-    except (DataError, IntegrityError), e:
+    except Exception as e:
       app.logger.error(sys._getframe().f_code.co_name + str(e))
       return False
     return True
