@@ -64,6 +64,8 @@ class CityPage(db.Model):
   three_bed_two_bath_upper_bound = db.Column(db.Integer())
   pic_url = db.Column(db.String(1024))
   app_pic_url = db.Column(db.String(1024))
+  button_pic_url = db.Column(db.String(1024))
+  button_dark_pic_url = db.Column(db.String(1024))
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
   city = relationship("City", back_populates="citypage")

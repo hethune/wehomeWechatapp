@@ -72,7 +72,8 @@ def login():
 @json_validate(filter=['token'])
 @requires_token
 def get_hot_cities():
-  columns = ['city_id', 'city_name', 'pic_url', 'increase_radio', 'rental_income_radio']
+  columns = ['city_id', 'city_name', 'pic_url', 'increase_radio', 'rental_income_radio', 'button_pic_url',
+    'button_dark_pic_url']
   d = {}
   l = []
   try:
@@ -84,6 +85,8 @@ def get_hot_cities():
         'pic_url': QueryHelper.pares_qiniu_pic(city.citypage.app_pic_url) if city.citypage else None,
         'increase_radio': city.citypage.increase_radio  if city.citypage else None,
         'rental_income_radio': city.citypage.rental_income_radio if city.citypage else None,
+        'button_pic_url': QueryHelper.pares_qiniu_pic(city.citypage.button_pic_url) if city.citypage else None,
+        'button_dark_pic_url': QueryHelper.pares_qiniu_pic(city.citypage.button_dark_pic_url) if city.citypage else None,
         })
       d['hot_cities'] = l
   except Exception as e:
