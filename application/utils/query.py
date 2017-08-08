@@ -219,7 +219,8 @@ class QueryHelper(object):
   @classmethod
   def set_user_phone_with_id(cls, user_id, phone, country_code, is_verified=True):
     user = cls.get_user_with_id(user_id=user_id)
-    if user.phone:
+    valdate_user = cls.get_user_with_phone_and_country(phone=phone, country=country)
+    if (not user) or (valdate_user.phone):
       return False
     try:
       user.phone = phone
