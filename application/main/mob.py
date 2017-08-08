@@ -163,4 +163,4 @@ def wechat_login():
   third_session = generate_token(user=user, session_key=None)
   session[str(user.id)] = third_session
   return jsonify(nick_name=user.nick_name, avatar_url=user.avatar_url, user_id=user.id,
-    third_session=third_session, success=True)
+    phone=user.phone, third_session=third_session, success=True)
