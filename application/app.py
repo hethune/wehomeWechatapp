@@ -283,14 +283,14 @@ def v3_home_page():
         place_name = QueryHelper.parse_address_by_map_box(place_name=place_name)
         logger.info('v3_home_page parse_address_by_map_box {}'.format(time.time()))
 
-      if home_cache[place_name]:
+      if app.config['IS_HOME_CACHE'] and home_cache[place_name]:
         return QueryHelper.to_response(data=json.loads(home_cache[place_name]))
 
       home_page = QueryHelper.get_home_page_with_place_name(place_name=place_name)
       logger.info('v3_home_page get_home_page_with_place_name {}'.format(time.time()))
     else:
       # home_id is not None get home cache by home_id
-      if home_cache[str(incoming['home_id'])]:
+      if app.config['IS_HOME_CACHE'] and home_cache[str(incoming['home_id'])]:
         return QueryHelper.to_response(data=json.loads(home_cache[str(incoming['home_id'])]))
 
       home_page = QueryHelper.get_home_page_with_home_id(home_id=incoming['home_id'])
@@ -357,8 +357,9 @@ def v3_home_page():
   logger.info('v3_home_page finish {}'.format(time.time()))
   result_dict = QueryHelper.to_dict_with_filter(rows_dict=d, columns=columns)
   result_json = dumps(result_dict)
-  home_cache.set_key_value(name=home_page.id, value=result_json, expiration=app.config['REDIS_HOME_CACHE_EXPIRE_TIME'])
-  home_cache.set_key_value(name=home_page.map_box_place_name, value=result_json, expiration=app.config['REDIS_HOME_CACHE_EXPIRE_TIME'])
+  if app.config['IS_HOME_CACHE']:
+    home_cache.set_key_value(name=home_page.id, value=result_json, expiration=app.config['REDIS_HOME_CACHE_EXPIRE_TIME'])
+    home_cache.set_key_value(name=home_page.map_box_place_name, value=result_json, expiration=app.config['REDIS_HOME_CACHE_EXPIRE_TIME'])
   return jsonify(result_dict), 200
 
 @app.route('/api/set_feedback', methods=['POST'])
