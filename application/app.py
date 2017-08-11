@@ -271,7 +271,7 @@ def v3_home_page():
     'rent', 'rental_radio', 'increase_radio', 'rental_income_radio',
     'neighborhood_rent_radio', 'city_name', 'city_trend', 'neighborhood_trend',
     'adjust_score', 'property_score', 'neighborhood_score', 'apartment', 'home_id', 'apt_no',
-    'bedroom', 'bathroom']
+    'bedroom', 'bathroom', 'airbnb_rent', 'tax', 'insurance', 'pm_long', 'pm_short']
   d = {}
   l = []
   home_page = place_name = None
