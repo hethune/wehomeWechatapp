@@ -313,7 +313,8 @@ def v3_home_page():
       d['apartment'] = l
       result_dict = QueryHelper.to_dict_with_filter(rows_dict=d, columns=columns)
       result_json = dumps(result_dict)
-      home_cache.set_key_value(name=home.map_box_place_name, value=result_json, expiration=app.config['REDIS_HOME_CACHE_EXPIRE_TIME'])
+      if app.config['IS_HOME_CACHE']:
+        home_cache.set_key_value(name=home.map_box_place_name, value=result_json, expiration=app.config['REDIS_HOME_CACHE_EXPIRE_TIME'])
       return jsonify(result_dict), 200
     elif not home_page:
       QueryHelper.add_unmatched_place(
