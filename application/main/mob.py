@@ -15,7 +15,7 @@ logger = app.logger
 @requires_token
 def register():
   incoming = request.get_json()
-  user = User(openid=None, nick_name=incoming["userName"], gender=incoming['gender'], language=None, city=None, country=incoming["country"],
+  user = User(openid=None, nick_name=incoming["userName"], gender=incoming['gender'], language=None, city=None, country_code=incoming["country"],
     province=None, avatar_url=None, phone=incoming["phone"], type=1, password=incoming["password"]
   )
 
@@ -51,7 +51,7 @@ def login():
   user = QueryHelper.get_user_with_phone_and_country(phone=incoming['phone'],
     country=incoming['country'])
   if not user:
-    user = User(openid=None, nick_name=incoming["phone"][0:3]+'*'*4+incoming['phone'][7:], gender=None, language=None, city=None, country=incoming["country"],
+    user = User(openid=None, nick_name=incoming["phone"][0:3]+'*'*4+incoming['phone'][7:], gender=None, language=None, city=None, country_code=incoming["country"],
     province=None, avatar_url=None, phone=incoming["phone"], type=1, password=None)
     try:
       db.session.add(user)
@@ -164,3 +164,37 @@ def wechat_login():
   session[str(user.id)] = third_session
   return jsonify(nick_name=user.nick_name, avatar_url=user.avatar_url, user_id=user.id,
     phone=user.phone, third_session=third_session, success=True)
+
+@mob.route("/verify_mobile_code", methods=["POST"])
+@uuid_gen
+@json_validate(filter=['token', 'phone', 'country', 'code', 'user_id'])
+@requires_token
+def app_verify_mobile_code():
+  incoming = request.get_json()
+  if not QueryHelper.verify_sms_code(phone=incoming['phone'], country=incoming['country'], code=incoming['code']):
+    logger.error('Verify the sms code failed')
+    return jsonify(success=False, message='Verify the sms code failed')
+  user = QueryHelper.get_user_with_phone_and_country(phone=incoming['phone'], country=incoming['country'])
+  if user:
+    new_user = QueryHelper.get_user_with_id(user_id=incoming['user_id'])
+    openid, nick_name, avatar_url = new_user.openid, new_user.nick_name, new_user.avatar_url
+    gender, province, country = new_user.gender, new_user.province, new_user.country
+    try:
+      db.session.delete(new_user)
+      db.session.commit()
+      user.openid, user.nick_name, user.avatar_url = openid, nick_name, avatar_url
+      user.gender, user.province, user.country = gender, province, country
+      db.session.merge(user)
+      db.session.commit()
+    except Exception as e:
+      logger.error('Verify the sms code failed'.format(e))
+      return jsonify(success=False, message='Verify the sms code failed'), 409
+  else:
+    user = QueryHelper.get_user_with_id(user_id=incoming['user_id'])
+    is_phone_success = QueryHelper.set_user_phone_with_id(user_id=incoming['user_id'], phone=incoming['phone'], country_code=incoming['country'])
+    # is_code_success = QueryHelper.set_phone_is_verified(phone=incoming['phone'], country=incoming['country'])
+    if not is_phone_success:
+      logger.error('Verify the sms code failed')
+      return jsonify(success=False, message='Verify the sms code failed'), 409
+
+  return jsonify(success=True, message='Verify the sms code successfully')
