@@ -15,8 +15,8 @@ logger = app.logger
 @requires_token
 def register():
   incoming = request.get_json()
-  user = User(openid=None, nick_name=incoming["userName"], gender=incoming['gender'], language=None, city=None, country_code=incoming["country"],
-    province=None, avatar_url=None, phone=incoming["phone"], type=1, password=incoming["password"]
+  user = User(openid=None, nick_name=incoming["userName"], gender=incoming['gender'], language=None, city=None, country=None,
+    province=None, avatar_url=None, phone=incoming["phone"], type=1, password=incoming["password"], country_code=incoming["country"]
   )
 
   # Verify phone number
@@ -51,8 +51,8 @@ def login():
   user = QueryHelper.get_user_with_phone_and_country(phone=incoming['phone'],
     country=incoming['country'])
   if not user:
-    user = User(openid=None, nick_name=incoming["phone"][0:3]+'*'*4+incoming['phone'][7:], gender=None, language=None, city=None, country_code=incoming["country"],
-    province=None, avatar_url=None, phone=incoming["phone"], type=1, password=None)
+    user = User(openid=None, nick_name=incoming["phone"][0:3]+'*'*4+incoming['phone'][7:], gender=None, language=None, city=None, country=None,
+    province=None, avatar_url=None, phone=incoming["phone"], type=1, password=None, country_code=incoming['country'])
     try:
       db.session.add(user)
       db.session.commit()
