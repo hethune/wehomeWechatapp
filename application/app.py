@@ -266,7 +266,7 @@ def v2_home_page():
 def v3_home_page():
   logger.info('v3_home_page start {}'.format(time.time()))
   incoming = request.get_json()
-  if not QueryHelper.validate_query_frequency_grant(user_id=g.current_user['id'], date=TODAY_DATE):
+  if app.config['IS_LIMIT_USER_VIEW_HOME_PAGE'] and not QueryHelper.validate_query_frequency_grant(user_id=g.current_user['id'], date=TODAY_DATE):
     logger.error("The user's query frequency is out of limit v3")
     return jsonify(success=False,
       message="The user's query frequency is out of limit"), 409
