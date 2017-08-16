@@ -130,6 +130,8 @@ class HomePage(db.Model):
   __table_args__ = (
     db.Index("idx_longitude_latitude", "longitude", "latitude"),
     db.Index("idx_home_page_source_id", 'source_id'),
+    db.Index("idx_home_page_created_at", 'created_at'),
+    db.Index("idx_home_page_updated_at", 'updated_at'),
   )
 
 class UnmatchedPlace(db.Model):
