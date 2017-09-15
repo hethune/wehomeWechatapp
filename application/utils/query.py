@@ -308,6 +308,10 @@ class QueryHelper(object):
     return CarouselFigure.query.filter_by(is_active=False).all()
 
   @classmethod
+  def v3_get_carouse_figure(cls):
+    return CarouselFigure.query.filter_by(is_active=True).all()
+
+  @classmethod
   def pares_qiniu_pic(cls, key):
     if not key:
       return None

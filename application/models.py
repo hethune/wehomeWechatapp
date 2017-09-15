@@ -319,6 +319,7 @@ class CarouselFigure(db.Model):
   is_active = db.Column(db.Boolean(), default=False, index=True)
   created_at = db.Column(db.DateTime(), default=datetime.datetime.now)
   updated_at = db.Column(db.DateTime(), default=datetime.datetime.now, onupdate=datetime.datetime.now)
+  external_link = db.Column(db.String(1024))
 
 class Answer(db.Model):
   id = db.Column(db.Integer(), index=True, primary_key=True)
