@@ -757,6 +757,31 @@ def v2_get_carouse_figure():
       message='Failed to get v2 carouse figure list')
   return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
 
+@app.route('/api/v3/get_carouse_figure', methods=['POST'])
+@uuid_gen
+@json_validate(filter=['token'])
+@requires_token
+def v3_get_carouse_figure():
+  incoming = request.get_json()
+  columns = ['index', 'pic_url','external_link']
+  d = {}
+  l = []
+  try:
+    ranks = QueryHelper.v3_get_carouse_figure()
+    for item in ranks:
+      l.append({
+        'index': item.index,
+        'pic_url': QueryHelper.pares_qiniu_pic(item.pic_url),
+        'external_link':item.external_link
+        })
+    d['carouse_figure'] = l
+  except Exception as e:
+    logger.error("Failed to get v3 carouse figure list {}".format(e))
+    return jsonify(success=False,
+      message='Failed to get v3 carouse figure list')
+  return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
+
+
 @app.route('/api/get_answer', methods=['POST'])
 @uuid_gen
 @json_validate(filter=['token'])
