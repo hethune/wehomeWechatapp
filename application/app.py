@@ -439,7 +439,7 @@ def v4_home_page():
     d['city_name'] = home_page.city.city_name if home_page.city else None
     d['exchange_rate'] = QueryHelper.get_index_page().exchange_rate
     d['home_page'] = home_page
-    d['favorite'] = None
+    d['favorite'] = True if QueryHelper.get_collection_with_user_home(user_id=g.current_user['id'], home_id=home_page.id) else False
     logger.info('v4_home_page validate data {}'.format(time.time()))
 
     # log the none value
