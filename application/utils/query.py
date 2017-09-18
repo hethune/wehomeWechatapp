@@ -249,6 +249,10 @@ class QueryHelper(object):
     return Collection.query.filter(and_(Collection.user_id==user_id, Collection.home_id==home_id)).first()
 
   @classmethod
+  def get_active_collection_with_user_home(cls, user_id, home_id):
+    return Collection.query.filter(and_(Collection.user_id==user_id, Collection.home_id==home_id,Collection.is_active==True)).first()
+
+  @classmethod
   def set_collection(cls, user_id, home_id):
     collection = cls.get_collection_with_user_home(user_id=user_id, home_id=home_id)
     if not collection:
