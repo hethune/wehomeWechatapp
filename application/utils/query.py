@@ -1,4 +1,4 @@
-from ..models import City, IndexPage, CityPage, HomePage, UnmatchedPlace, FeedBack, User, Phone, Collection, CityCount, CityRankingList, TotalRankingList
+from ..models import City, IndexPage, CityPage, HomePage, UnmatchedPlace, FeedBack, User, Phone, Collection, CityCount, CityRankingList, TotalRankingList, CityPct
 from ..models import SuperRankingList, CarouselFigure, Answer, UserQueryFrequency, CityCollection, ReadCondition, Picture
 from index import app, db, bcrypt
 from flask import jsonify
@@ -12,6 +12,7 @@ import datetime
 import sys
 from qiniu import Auth
 from flask.json import dumps
+import pandas as pd
 
 FIVE_MINUTES = 60*5
 
@@ -490,6 +491,18 @@ class QueryHelper(object):
     '''.format(place_name=place_name)
     result = db.session.execute(query)
     return result.fetchall()
+
+  @classmethod
+  def get_score_pct_position(cls,score,city_id):
+    citypct = CityPct.query.filter_by(city_id=city_id).first()
+    if citypct and citypct.city_id!=0:
+      s = citypct.bin_pct.replace('(','[').replace(')',']')
+      pct_positions = pd.DataFrame(json.loads(s))
+      pct_positions.drop_duplicates(subset=0, keep='last',inplace=True)
+      pct_positions.set_index(0,inplace=True)
+      compare_index = pct_positions.index.get_loc(score,method='nearest')
+      value = pct_positions.iloc[compare_index][1]
+      return float(value)
 
   @classmethod
   def get_user_with_phone_and_country(cls, phone, country):
