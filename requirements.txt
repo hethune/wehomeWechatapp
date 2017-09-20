@@ -25,3 +25,4 @@ celery==4.0.2
 redis==2.10.5
 qiniu==7.1.4
 flask_bcrypt
+pandas
