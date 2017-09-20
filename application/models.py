@@ -395,3 +395,8 @@ class Picture(db.Model):
   __table_args__ = (
     db.Index("idx_picture_type_is_active", "type", 'is_active'),
   )
+
+class CityPct(db.Model):
+  id = db.Column(db.Integer(), index=True, primary_key=True)
+  city_id = db.Column(db.Integer())
+  bin_pct = db.Column(db.Text())
