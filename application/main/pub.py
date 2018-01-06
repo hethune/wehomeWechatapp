@@ -181,7 +181,7 @@ def company_city_page():
     d['list_price'] = city_page.list_average_price
     d['trend'] = {'history':trend.values()[0]}
     d['return'] = city_page.increase_radio+city_page.rental_income_radio
-    rooms_=QueryHelper.get_home_pages_with_query(incoming['city_id'],offset=1,limit=50,**{'hq':1})
+    rooms_ = QueryHelper.get_home_pages_with_query(incoming['city_id'],offset=1,limit=50,**{'hq':1})
     d['rooms'] = rooms_[0]
     for r in rooms_[0]:
       r.type = 'Apartment' if r.apt_no else 'Single Family House'
