@@ -494,11 +494,15 @@ class QueryHelper(object):
 
   @classmethod
   def get_home_pages_with_query(cls,city_id,offset,limit,**kwargs):
-    ONE_MONTH_AGO = datetime.datetime.today()-datetime.timedelta(days=190)
-    query = db.session.query(HomePage)
+    THREE_MONTH_AGO = datetime.datetime.today()-datetime.timedelta(days=90)
+    betters_ids = CityRankingList.query.filter(and_(CityRankingList.city_id==city_id,CityRankingList.created_at>THREE_MONTH_AGO)).all()
+    ids = [i.home_id for i in betters_ids]
 
-    offset = int(offset) if offset<50 else 50
-    limit = int(limit) if limit<50 else 50
+    query = db.session.query(HomePage)
+    query=query.filter(HomePage.id.in_(ids))
+
+    offset = int(offset) if offset<20 else 20
+    limit = int(limit) if limit<10 else 10
 
     filters_category = ['bedroom','bathroom','zipcode','city_id']
     filters_range = ['price_l','price_h','hq']   # hq= high quality
@@ -516,12 +520,7 @@ class QueryHelper(object):
         query = query.filter(HomePage.house_price_dollar>=value)
       if attr in filters_range and attr=='price_h' and value:
         query = query.filter(HomePage.house_price_dollar<=value)
-      if attr in filters_range and attr=='hq' and value:
-        query = query.filter(HomePage.score<100)
-        query = query.filter(HomePage.score>=80)
-        query = query.filter(HomePage.created_at>ONE_MONTH_AGO)
-
-      # sort here
+     #  # sort here
       if attr in sorts and attr=='sort_price':
         if int(value)==1:
           query = query.order_by(HomePage.house_price_dollar.asc())
@@ -533,9 +532,6 @@ class QueryHelper(object):
         elif int(value)==-1:
           query = query.order_by(HomePage.created_at.desc())
 
-    # handle NULL and distinct
-    query = query.filter(and_(HomePage.house_price_dollar!=None,HomePage.pic_url!=None))
-    #query = query.distinct(HomePage.map_box_place_name)
     record_query = query.paginate(offset,limit,False)
     total = record_query.total
     return record_query.items,total
