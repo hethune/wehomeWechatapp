@@ -187,7 +187,7 @@ def company_city_page():
       r.type = 'Apartment' if r.apt_no else 'Single Family House'
       r.house_price = r.house_price_dollar
     result_dict = QueryHelper.to_dict_with_filter(rows_dict=d, columns=columns)
-    d['hq_length'] = rooms_[1]
+    d['hq_length'] = int(rooms_[1])
   except Exception as e:
     logger.error("Failed to get city page list {}".format(e))
     return jsonify(success=False,
@@ -217,7 +217,7 @@ def listing_page():
       r.type = 'Apartment' if r.apt_no else 'Single Family House'
       r.house_price = r.house_price_dollar
     result_dict = QueryHelper.to_dict_with_filter(rows_dict=d, columns=columns)
-    result_dict['length']=rooms_[1]
+    result_dict['length']=int(rooms_[1])
     result_json = dumps(result_dict)
     return result_json
   except Exception as e:
