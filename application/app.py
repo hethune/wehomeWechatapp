@@ -12,8 +12,16 @@ import datetime
 from index import session, home_cache
 import time
 from application.main.mob import mob as mob_blueprint
+from application.main.pub import company as company_blueprint
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
+limiter = Limiter(app,key_func=get_remote_address)
+limiter.limit("100000/day;20000/hour;3000/minute;500/second")(company_blueprint)
+limiter.exempt(mob_blueprint)
 
 app.register_blueprint(mob_blueprint, url_prefix='/api/mob')
+app.register_blueprint(company_blueprint)
 logger = app.logger
 HALF_MINUTE = 30
 TODAY_DATE = datetime.date.today().strftime('%Y-%m-%d')
@@ -667,10 +675,6 @@ def verify_mobile_code():
 
   return jsonify(success=True, message='Verify the sms code successfully')
 
-@app.route('/ping', methods=['GET'])
-def ping():
-  return 'pong'
-
 @app.route('/api/set_collection', methods=['POST'])
 @uuid_gen
 @json_validate(filter=['home_id', 'token', 'third_session'])
@@ -1030,3 +1034,7 @@ def get_all_or_follow_homes():
     return jsonify(success=False,
       message='Failed to get all new homes list')
   return QueryHelper.to_json_with_filter(rows_dict=d, columns=columns)
+
+@app.route('/ping', methods=['GET'])
+def ping():
+  return 'pong'
