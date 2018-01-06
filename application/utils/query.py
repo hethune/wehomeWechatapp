@@ -500,11 +500,12 @@ class QueryHelper(object):
     offset = int(offset) if offset<50 else 50
     limit = int(limit) if limit<50 else 50
 
-    filters_category = ['bedroom','bathroom','zipcode']
+    filters_category = ['bedroom','bathroom','zipcode','city_id']
     filters_range = ['price_l','price_h','hq']   # hq= high quality
     sorts = ['sort_price','sort_list']
 
     #query = query.order_by(HomePage.map_box_place_name)
+    query = query.filter(getattr(HomePage,'city_id')==city_id)
     # filters
     for attr,value in kwargs.iteritems():
       if attr in filters_category and attr!='zipcode':
