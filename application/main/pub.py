@@ -203,7 +203,7 @@ def company_city_page():
 @increment(count_type=Count.LISTING_TYPE)
 def listing_page():
   d = {}
-  columns = ['id','room_type','map_box_place_name','house_price','size','city_id','bedroom','pic_url','length','type']
+  columns = ['id','room_type','map_box_place_name','house_price','size','city_id','bedroom','bathroom','pic_url','length','type']
   try:
     incoming = request.get_json()
     shorter_incoming = {k:incoming[k] for k in incoming.keys() if k not in ['city_id','offset','limit']}
