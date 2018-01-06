@@ -37,3 +37,8 @@ class BaseConfig(object):
   WEHCAT_GET_USERINFO_URL = 'https://api.weixin.qq.com/sns/userinfo'
   REDIS_HOME_CACHE_DB_NAME = 'homecache'
   REDIS_HOME_CACHE_EXPIRE_TIME = 60 * 5
+
+  # for cooperation
+  COUNT_ENABLED = True
+  REDIS_DB = 1
+  BOSS2_KEY = ''

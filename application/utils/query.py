@@ -493,6 +493,53 @@ class QueryHelper(object):
     return result.fetchall()
 
   @classmethod
+  def get_home_pages_with_query(cls,city_id,offset,limit,**kwargs):
+    ONE_MONTH_AGO = datetime.datetime.today()-datetime.timedelta(days=190)
+    query = db.session.query(HomePage)
+
+    offset = int(offset) if offset<50 else 50
+    limit = int(limit) if limit<50 else 50
+
+    filters_category = ['bedroom','bathroom','zipcode']
+    filters_range = ['price_l','price_h','hq']   # hq= high quality
+    sorts = ['sort_price','sort_list']
+
+    #query = query.order_by(HomePage.map_box_place_name)
+    # filters
+    for attr,value in kwargs.iteritems():
+      if attr in filters_category and attr!='zipcode':
+        query = query.filter(getattr(HomePage,attr)==value)
+      if attr in filters_category and attr == 'zipcode' and value:
+        query = query.filter(HomePage.map_box_place_name.like('%{}, United States'.format(value)))
+      if attr in filters_range and attr=='price_l' and value:
+        query = query.filter(HomePage.house_price_dollar>=value)
+      if attr in filters_range and attr=='price_h' and value:
+        query = query.filter(HomePage.house_price_dollar<=value)
+      if attr in filters_range and attr=='hq' and value:
+        query = query.filter(HomePage.score<100)
+        query = query.filter(HomePage.score>=80)
+        query = query.filter(HomePage.created_at>ONE_MONTH_AGO)
+
+      # sort here
+      if attr in sorts and attr=='sort_price':
+        if int(value)==1:
+          query = query.order_by(HomePage.house_price_dollar.asc())
+        elif int(value)==-1:
+          query = query.order_by(HomePage.house_price_dollar.desc())
+      if attr in sorts and attr=='sort_list':
+        if int(value)==1:
+          query = query.order_by(HomePage.created_at.asc())
+        elif int(value)==-1:
+          query = query.order_by(HomePage.created_at.desc())
+
+    # handle NULL and distinct
+    query = query.filter(and_(HomePage.house_price_dollar!=None,HomePage.pic_url!=None))
+    #query = query.distinct(HomePage.map_box_place_name)
+    record_query = query.paginate(offset,limit,False)
+    total = record_query.total
+    return record_query.items,total
+
+  @classmethod
   def get_score_pct_position(cls,score,city_id):
     citypct = CityPct.query.filter_by(city_id=city_id).first()
     if citypct and citypct.city_id!=0:

@@ -5,16 +5,20 @@ import logging
 from celery import Celery
 from application.utils.cache import RedisCache, HomeCache
 from flask_bcrypt import Bcrypt
+from application.utils.count import Count
+from application.utils.redisDB import RedisDB
 
 app = Flask(__name__)
 app.config.from_object(BaseConfig)
 app.secret_key = app.config['APP_SECRET_KEY']
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
+redis_db_counts = RedisDB(host=app.config['REDIS_SESSION_HOST'], port=app.config['REDIS_SESSION_PORT'], dbname='counts', db=app.config['REDIS_DB'])
 session = RedisCache(host=app.config['REDIS_SESSION_HOST'], port=app.config['REDIS_SESSION_PORT'],
   password=app.config['REDIS_SESSION_PWD'], dbname=app.config['REDIS_SESSION_DB_NAME'])
 home_cache = HomeCache(host=app.config['REDIS_SESSION_HOST'], port=app.config['REDIS_SESSION_PORT'],
   password=app.config['REDIS_SESSION_PWD'], db=2)
+count = Count(redis_db_counts)
 
 # logger
 class RequestIdFilter(logging.Filter):
