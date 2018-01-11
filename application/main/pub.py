@@ -12,7 +12,7 @@ import time
 import re
 import json
 
-ALLOW_CITY_ID = [1,2,4,10,3,8,9,5,6]
+ALLOW_CITY_ID = [1,2,4,10,3]#,8,9,5,6]
 company = Blueprint('company', __name__)
 logger = app.logger
 
