@@ -20,7 +20,7 @@ six==1.10.0
 SQLAlchemy==1.1.11
 tqdm==4.14.0
 urllib3==1.21.1
-Werkzeug==0.12.2
+Werkzeug==0.15.3
 celery==4.0.2
 redis==2.10.5
 qiniu==7.1.4
